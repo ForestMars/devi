@@ -1,7 +1,7 @@
 # app.yml
 name: PR Review Agent
 description: Automated AI code review for pull requests
-url: https://github.com/yourusername/pr-review-agent
+url: http://localhost:3000
 version: 1.0.0
 
 default_permissions:
