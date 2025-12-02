@@ -25,7 +25,11 @@ export class OllamaProvider implements LLMProvider {
       body: JSON.stringify({
         model: this.model,
         prompt: prompt,
-        stream: false
+        stream: false,
+        options: {
+          temperature: 0.3,
+          num_predict: 4096
+        }
       })
     });
 
@@ -122,5 +126,105 @@ export class AnthropicProvider implements LLMProvider {
 
     const data = await response.json();
     return data.content[0].text;
+  }
+}
+
+export class OpenRouterProvider implements LLMProvider {
+  name = "OpenRouter";
+
+  constructor(
+    private apiKey: string,
+    private model: string,
+    private baseUrl: string = "https://openrouter.ai/api/v1"
+  ) {}
+
+  getModelName(): string {
+    return `OpenRouter (${this.model})`;
+  }
+
+  async generateReview(prompt: string): Promise<string> {
+    const response = await fetch(`${this.baseUrl}/chat/completions`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${this.apiKey}`,
+        "HTTP-Referer": "https://github.com/ForestMars/devi",
+        "X-Title": "PR Review Agent"
+      },
+      body: JSON.stringify({
+        model: this.model,
+        messages: [
+          {
+            role: "system",
+            content: "You are an expert code reviewer. Provide constructive, actionable feedback on code changes."
+          },
+          {
+            role: "user",
+            content: prompt
+          }
+        ],
+        temperature: 0.3,
+        max_tokens: 4096
+      })
+    });
+
+    if (!response.ok) {
+      const error = await response.text();
+      throw new Error(`OpenRouter API error: ${response.statusText} - ${error}`);
+    }
+
+    const data = await response.json();
+    return data.choices[0].message.content;
+  }
+}
+
+export class GeminiProvider implements LLMProvider {
+  name = "Gemini";
+
+  constructor(
+    private apiKey: string,
+    private model: string
+  ) {}
+
+  getModelName(): string {
+    return `Gemini (${this.model})`;
+  }
+
+  async generateReview(prompt: string): Promise<string> {
+    // Remove version suffix if present (e.g., "gemini-2.0-flash-exp" -> "gemini-2.0-flash-exp")
+    const modelName = this.model;
+    
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${this.apiKey}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          contents: [
+            {
+              parts: [
+                {
+                  text: `You are an expert code reviewer. Provide constructive, actionable feedback on code changes.\n\n${prompt}`
+                }
+              ]
+            }
+          ],
+          generationConfig: {
+            temperature: 0.3,
+            maxOutputTokens: 4096
+          }
+        })
+      }
+    );
+
+    if (!response.ok) {
+      const error = await response.text();
+      throw new Error(`Gemini API error: ${response.statusText} - ${error}`);
+    }
+
+    const data = await response.json();
+    return data.candidates[0].content.parts[0].text;
   }
 }
