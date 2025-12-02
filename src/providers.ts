@@ -1,6 +1,8 @@
 // src/providers.ts
+
 export interface LLMProvider {
   name: string;
+  getModelName(): string;
   generateReview(prompt: string): Promise<string>;
 }
 
@@ -11,6 +13,10 @@ export class OllamaProvider implements LLMProvider {
     private host: string,
     private model: string
   ) {}
+
+  getModelName(): string {
+    return `Ollama (${this.model})`;
+  }
 
   async generateReview(prompt: string): Promise<string> {
     const response = await fetch(`${this.host}/api/generate`, {
@@ -39,6 +45,10 @@ export class OpenAIProvider implements LLMProvider {
     private apiKey: string,
     private model: string
   ) {}
+
+  getModelName(): string {
+    return `OpenAI (${this.model})`;
+  }
 
   async generateReview(prompt: string): Promise<string> {
     const response = await fetch("https://api.openai.com/v1/chat/completions", {
@@ -79,6 +89,10 @@ export class AnthropicProvider implements LLMProvider {
     private apiKey: string,
     private model: string
   ) {}
+
+  getModelName(): string {
+    return `Claude (${this.model})`;
+  }
 
   async generateReview(prompt: string): Promise<string> {
     const response = await fetch("https://api.anthropic.com/v1/messages", {
