@@ -6,6 +6,7 @@ Setup
 ******
 
 This document outlines the steps required to set up the project both locally and for integration with GitHub.
+This project, `ForestMars/devi`, operates as a PR review agent powered by Ollama.
 
 ---
 
@@ -14,7 +15,7 @@ This document outlines the steps required to set up the project both locally and
 Local Setup
 ===========
 
-Follow these steps to configure your local environment:
+Follow these steps to configure your local environment and receive webhooks via **smee**.
 
 1.  **Install Bun:**
     .. code-block:: bash
@@ -41,6 +42,27 @@ Follow these steps to configure your local environment:
 5.  **Environment File:**
     * Create a ``.env`` file in the root directory. (Refer to project documentation for contents.)
 
+6.  **Setup Smee.io for Local Tunneling**
+    To receive webhooks (like those from Render.com or GitHub) on your local machine, you must use a tunneling service.
+
+    * **Install Smee Client:**
+        .. code-block:: bash
+
+            npm install --global smee-client
+
+    * **Get a Smee Channel URL:**
+        Go to **https://smee.io/** and click **"Start a new channel"** to get a unique URL (e.g., ``https://smee.io/aBcDeF12345``).
+
+    * **Run Smee Client:**
+        Forward the webhook payloads from the Smee URL to your local server (running on port 3000):
+        .. code-block:: bash
+
+            smee -u YOUR_SMEE_URL -t http://localhost:3000/api/webhook/github
+
+        .. important::
+            * Replace ``YOUR_SMEE_URL`` with the unique URL you obtained from smee.io.
+            * **Crucially:** You must configure the webhook URL in **GitHub** (via your Render.com settings) to use this **Smee URL** instead of your local IP address.
+
 ---
 
 .. _github-setup:
@@ -48,7 +70,7 @@ Follow these steps to configure your local environment:
 GitHub Setup
 ============
 
-This section covers the necessary configurations for GitHub integration, including setting up a Personal Access Token and a Webhook Secret.
+This section covers the necessary configurations for GitHub integration.
 
 Personal Access Token
 ---------------------
