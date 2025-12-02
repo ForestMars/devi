@@ -3,6 +3,7 @@
   "configVersion": 1,
   "workspaces": {
     "": {
+      "name": "ragsoup",
       "dependencies": {
         "probot": "^13.3.0",
       },

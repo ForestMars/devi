@@ -1,6 +1,6 @@
 {
-  "name": "pr-review-agent",
-  "version": "1.0.0",
+  "name": "ragsoup",
+  "version": "0.0.1",
   "type": "module",
   "scripts": {
     "dev": "tsx node_modules/.bin/probot run ./src/index.ts",
