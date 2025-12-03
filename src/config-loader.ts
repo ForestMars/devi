@@ -90,11 +90,25 @@ export class ConfigLoader {
     }
 
     // Parse model string: "provider:model" or just "model" (uses default provider)
-    const [providerName, modelName] = agent.model.includes(':') 
-      ? agent.model.split(':')
-      : [config.llm.default_provider, agent.model];
+// Parse model string: "provider:model" or just "model" (uses default provider)
+const parts = agent.model.split(':');
 
-    const providerConfig = config.llm.providers[providerName];
+// Check if the model string has a provider prefix (e.g., "ollama:...")
+const hasProviderPrefix = parts.length > 1;
+
+// If it has a prefix, the provider is the first part, and the rest is the model name.
+// We rejoin the remaining parts to handle colons within the model name (e.g., "qwen:14b").
+const providerName = hasProviderPrefix ? parts[0] : config.llm.default_provider;
+const modelName = hasProviderPrefix ? parts.slice(1).join(':') : agent.model; 
+
+// --- OLD LOGIC, replaced with the above --- @DEPRECATED
+// const [providerName, modelName] = agent.model.includes(':') 
+//   ? agent.model.split(':')
+//   : [config.llm.default_provider, agent.model];
+// ------------------------------------------
+
+const providerConfig = config.llm.providers[providerName];
+
     if (!providerConfig) {
       throw new Error(`Provider not found: ${providerName}`);
     }
