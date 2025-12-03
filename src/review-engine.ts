@@ -131,7 +131,16 @@ export class ReviewEngine {
       /\.map$/,
       /dist\//,
       /build\//,
-      /node_modules\//
+      /node_modules\//,
+      /^README/i,
+      /\.md$/,
+      /\.rst$/,
+      /\.txt$/,
+      /^LICENSE/i,
+      /^CHANGELOG/i,
+      /^CONTRIBUTING/i,
+      /\.mdx$/,
+      /docs\//
     ];
 
     return files
@@ -141,6 +150,11 @@ export class ReviewEngine {
   }
 
   private async generateReview(pr: any, files: PRFile[]): Promise<ReviewFinding[]> {
+    // --- NEW DEBUGGING LOGS ---
+    console.log(`\n\n!!! DEBUG: Files being sent to LLM (${files.length}):`);
+    files.forEach(f => console.log(`  - ${f.filename}`));
+    console.log('!!! END DEBUG\n');
+    
     const prompt = this.buildReviewPrompt(pr, files);
     
     try {
