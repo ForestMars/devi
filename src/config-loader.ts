@@ -1,5 +1,7 @@
 // src/config-loader.ts
 import * as fs from 'fs';
+import * as path from 'path'; // Added for path resolution
+import * as url from 'url'; // Added for __dirname compatibility
 import * as yaml from 'yaml';
 import { LLMProvider, OllamaProvider, AnthropicProvider, OpenAIProvider, OpenRouterProvider, GeminiProvider } from './providers';
 
@@ -40,7 +42,14 @@ export interface Trigger {
 export class ConfigLoader {
   private config: AgentConfig | null = null;
 
-  constructor(private configPath: string = './.github/agent-workflow.yml') {}
+  constructor(private configPath: string = './.github/agent-workflow.yml') {
+    // Manually define __filename and __dirname for ES Module compatibility
+    const __filename = url.fileURLToPath(import.meta.url);
+    const __dirname = path.dirname(__filename);
+    
+    // Resolve config path relative to the config-loader file
+    this.configPath = path.resolve(__dirname, '..', '..', this.configPath);
+  }
 
   /**
    * Load and parse the YAML config file
@@ -80,6 +89,7 @@ export class ConfigLoader {
 
   /**
    * Create an LLM provider instance based on agent config
+   * This function now includes the model parsing fix and the DRY logging harness.
    */
   createProvider(agentName: string): LLMProvider {
     const config = this.load();
@@ -89,31 +99,31 @@ export class ConfigLoader {
       throw new Error(`Agent not found: ${agentName}`);
     }
 
-    // Parse model string: "provider:model" or just "model" (uses default provider)
-// Parse model string: "provider:model" or just "model" (uses default provider)
-const parts = agent.model.split(':');
+    // FIX: Correctly parse model string: "provider:model" 
+    const parts = agent.model.split(':');
+    const hasProviderPrefix = parts.length > 1;
 
-// Check if the model string has a provider prefix (e.g., "ollama:...")
-const hasProviderPrefix = parts.length > 1;
+    const providerName = hasProviderPrefix ? parts[0] : config.llm.default_provider;
+    // FIX: Rejoin remaining parts to handle colons within the model name (e.g., qwen2.5-coder:14b)
+    const requestedModelName = hasProviderPrefix ? parts.slice(1).join(':') : agent.model; 
 
-// If it has a prefix, the provider is the first part, and the rest is the model name.
-// We rejoin the remaining parts to handle colons within the model name (e.g., "qwen:14b").
-const providerName = hasProviderPrefix ? parts[0] : config.llm.default_provider;
-const modelName = hasProviderPrefix ? parts.slice(1).join(':') : agent.model; 
-
-// --- OLD LOGIC, replaced with the above --- @DEPRECATED
-// const [providerName, modelName] = agent.model.includes(':') 
-//   ? agent.model.split(':')
-//   : [config.llm.default_provider, agent.model];
-// ------------------------------------------
-
-const providerConfig = config.llm.providers[providerName];
-
+    const providerConfig = config.llm.providers[providerName];
     if (!providerConfig) {
       throw new Error(`Provider not found: ${providerName}`);
     }
 
-    return this.instantiateProvider(providerName, modelName, providerConfig);
+    // Instantiate provider (which handles the actual model loading/fallback)
+    const providerInstance = this.instantiateProvider(providerName, requestedModelName, providerConfig);
+    
+    // Harness Logging Check: Get the model name that was actually loaded
+    const finalModelName = providerInstance.getModelName();
+    
+    if (requestedModelName !== finalModelName) {
+      // Log the required console message (DRY harness)
+      console.warn(`model [${requestedModelName}] not found for agent [${agentName}]. Falling back to default model [${finalModelName}].`);
+    }
+
+    return providerInstance;
   }
 
   /**
