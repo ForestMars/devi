@@ -1,7 +1,7 @@
 // src/config-loader.ts
 import * as fs from 'fs';
-import * as path from 'path'; // Added for path resolution
-import * as url from 'url'; // Added for __dirname compatibility
+import * as path from 'path';
+import * as url from 'url';
 import * as yaml from 'yaml';
 import { LLMProvider, OllamaProvider, AnthropicProvider, OpenAIProvider, OpenRouterProvider, GeminiProvider } from './providers';
 
@@ -87,9 +87,26 @@ export class ConfigLoader {
     return config.agents[agentName] || null;
   }
 
+  // --- MODEL VALIDATION SIMULATION (Conceptual, replace with API call if necessary) ---
+  /**
+   * Checks model availability. In a real app, this would use an API call 
+   * (e.g., Ollama's /api/show). For the current debugging state, we simplify.
+   */
+  private checkModelAvailability(providerName: string, modelName: string, providerConfig: ProviderConfig): boolean {
+    // Check if the model is explicitly listed in the provider config's 'models' array.
+    // If we assume the agent workflow config lists ALL available models, this is a sufficient check.
+    if (providerConfig.models.includes(modelName)) {
+        return true;
+    }
+    
+    // NOTE: If the model is not in the list, it's considered unavailable for the harness.
+    return false;
+  }
+  // ----------------------------------------------------------------------------------
+
   /**
    * Create an LLM provider instance based on agent config
-   * This function now includes the model parsing fix and the DRY logging harness.
+   * This implements the centralized model fallback harness and logging.
    */
   createProvider(agentName: string): LLMProvider {
     const config = this.load();
@@ -99,30 +116,43 @@ export class ConfigLoader {
       throw new Error(`Agent not found: ${agentName}`);
     }
 
-    // FIX: Correctly parse model string: "provider:model" 
+    // Parse model string: "provider:model"
     const parts = agent.model.split(':');
     const hasProviderPrefix = parts.length > 1;
 
     const providerName = hasProviderPrefix ? parts[0] : config.llm.default_provider;
-    // FIX: Rejoin remaining parts to handle colons within the model name (e.g., qwen2.5-coder:14b)
+    // Rejoin remaining parts to handle colons within the model name (e.g., qwen2.5-coder:14b)
     const requestedModelName = hasProviderPrefix ? parts.slice(1).join(':') : agent.model; 
 
     const providerConfig = config.llm.providers[providerName];
     if (!providerConfig) {
       throw new Error(`Provider not found: ${providerName}`);
     }
+    
+    // --- START: THE DRY AGENT HARNESS (Fallback and Logging) ---
+    let finalModelName = requestedModelName;
+    const defaultModelName = config.llm.default_model;
 
-    // Instantiate provider (which handles the actual model loading/fallback)
-    const providerInstance = this.instantiateProvider(providerName, requestedModelName, providerConfig);
-    
-    // Harness Logging Check: Get the model name that was actually loaded
-    const finalModelName = providerInstance.getModelName();
-    
-    if (requestedModelName !== finalModelName) {
-      // Log the required console message (DRY harness)
-      console.warn(`model [${requestedModelName}] not found for agent [${agentName}]. Falling back to default model [${finalModelName}].`);
+    // 1. Check if the requested model is available (based on config list)
+    if (!this.checkModelAvailability(providerName, requestedModelName, providerConfig)) {
+        
+        // 2. Log the required console message
+        console.warn(`model [${requestedModelName}] not found for agent [${agentName}]. Falling back to default model [${defaultModelName}].`);
+        
+        // 3. Set the final model name to the configured default
+        finalModelName = defaultModelName;
+        
+        // Optional: Check if the fallback model is also listed as available
+        if (!this.checkModelAvailability(providerName, finalModelName, providerConfig)) {
+            // We still proceed, but the developer should be warned their fallback is also potentially bad
+            console.warn(`Warning: Fallback model [${finalModelName}] is also not listed as available for provider [${providerName}].`);
+        }
     }
+    // --- END: THE DRY AGENT HARNESS ---
 
+    // Instantiate provider with the final, confirmed model name
+    const providerInstance = this.instantiateProvider(providerName, finalModelName, providerConfig);
+    
     return providerInstance;
   }
 
