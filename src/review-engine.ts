@@ -4,10 +4,11 @@ import { Context } from 'probot';
 import { LLMProvider } from './providers';
 import { ConfigLoader } from './config-loader';
 import * as path from 'path';
+import * as fs from 'fs';
 
 const MAX_FILE_SIZE_KB = 512;
-const MAX_CHANGES_PER_FILE = 500;
-const MAX_FILES_TO_REVIEW = 10;
+const MAX_CHANGES_PER_FILE = 999;
+const MAX_FILES_TO_REVIEW = 19;
 
 interface PRFile {
   sha: string;
@@ -46,6 +47,8 @@ export class ReviewEngine {
     const repoName = repo.name;
     const prNumber = pr.number;
 
+    const initialModelName = this.llm.getModelName(); 
+
     try {
       const { data: files } = await context.octokit.pulls.listFiles({
         owner,
@@ -61,15 +64,11 @@ export class ReviewEngine {
         return;
       }
       
-      // --- CRITICAL DEBUGGING TRACE 1 ---
       console.log(`[DEBUG_TRACE] 1. Initial LLM model: ${this.llm.getModelName()}`);
-      // ----------------------------------
 
       const findings = await this.generateReview(pr, filesToReview);
       
-      // --- CRITICAL DEBUGGING TRACE 2 ---
       console.log(`[DEBUG_TRACE] 2. LLM model after generation: ${this.llm.getModelName()}`);
-      // ----------------------------------
 
       console.log(`✓ Parsed ${findings.length} finding(s)`);
 
@@ -78,7 +77,6 @@ export class ReviewEngine {
       } else {
         console.log('✓ No issues found');
         
-        // --- FIXED COMMENT FORMATTING FOR NO ISSUES ---
         const modelName = this.llm.getModelName();
         await context.octokit.issues.createComment({
           owner,
@@ -86,7 +84,6 @@ export class ReviewEngine {
           issue_number: prNumber,
           body: `## 🤖 AI Code Review (${this.llm.name} (${modelName}))\n\n✅ No significant issues found. Code looks good!`
         });
-        // ---------------------------------------------
       }
       
       console.log('✅ Review complete!');
@@ -94,98 +91,114 @@ export class ReviewEngine {
     } catch (error: any) {
       console.error(`🔴 Fatal error during review for PR #${prNumber}: ${error.message}`);
       
-      // --- ERROR COMMENT FORMATTING ---
-      const modelName = this.llm.getModelName();
       await context.octokit.issues.createComment({
         owner,
         repo: repoName,
         issue_number: prNumber,
-        body: `## 🤖 AI Code Review (${this.llm.name} (${modelName}))\n\n❌ Review failed due to internal error: \n\`\`\`\n${error.message}\n\`\`\``
+        body: `## 🤖 AI Code Review (${this.llm.name} (${initialModelName}))\n\n❌ Review failed due to internal error: \n\`\`\`\n${error.message}\n\`\`\``
       });
-      // --------------------------------
     }
   }
 
   /**
    * Filters and limits the files to be reviewed.
    */
-  private filterFiles(files: PRFile[]): PRFile[] {
-    const ignorePatterns = [
-      /\.lock$/,
-      /package-lock\.json$/,
-      /yarn\.lock$/,
-      /bun\.lockb$/,
-      /\.min\.(js|css)$/,
-      /\.map$/,
-      /dist\//,
-      /build\//,
-      /node_modules\//,
-      
-      // Agent Config/Documentation Ignores
-      /README\.(rst|md)$/, 
-      /\.md$/, 
-      /\.yml$/, 
-      /prompts\//, 
-      /\.txt$/, 
-    ];
+private filterFiles(files: any[]): PRFile[] {
+  const ignorePatterns = [
+    /\.lock$/,
+    /package-lock\.json$/,
+    /yarn\.lock$/,
+    /bun\.lockb$/,
+    /\.min\.(js|css)$/,
+    /\.map$/,
+    /dist\//,
+    /build\//,
+    /node_modules\//,
+    // Documentation files - don't send to code review
+    /^README/i,
+    /\.md$/,
+    /\.rst$/,
+    /^LICENSE/i,
+    /^CHANGELOG/i
+  ];
 
-    return files
-      .filter(f => !ignorePatterns.some(pattern => pattern.test(f.filename)))
-      .filter(f => f.changes < MAX_CHANGES_PER_FILE)
-      .slice(0, MAX_FILES_TO_REVIEW);
+  const MAX_FILE_CHANGES = 800;  // Increased from 500
+  const MAX_FILES = 15;           // Increased from 10
+
+  console.log(`\n📊 FILE FILTERING:`);
+  console.log(`   Total files in PR: ${files.length}`);
+
+  // Track what gets filtered and why
+  const filtered = files.filter(f => {
+    // Check ignore patterns
+    if (ignorePatterns.some(pattern => pattern.test(f.filename))) {
+      console.log(`   ✗ IGNORED: ${f.filename} (matched ignore pattern)`);
+      return false;
+    }
+    
+    // Check file size
+    if (f.changes >= MAX_FILE_CHANGES) {
+      console.log(`   ✗ TOO LARGE: ${f.filename} (${f.changes} changes, limit: ${MAX_FILE_CHANGES})`);
+      return false;
+    }
+    
+    console.log(`   ✓ INCLUDED: ${f.filename} (${f.changes} changes)`);
+    return true;
+  });
+
+  const result = filtered.slice(0, MAX_FILES);
+
+  if (filtered.length > MAX_FILES) {
+    console.log(`   ⚠️  WARNING: Truncated to first ${MAX_FILES} files (had ${filtered.length})`);
   }
+
+  console.log(`\n   📋 FINAL: Reviewing ${result.length} of ${files.length} files\n`);
+
+  return result;
+}
 
   /**
    * Generates the review by calling the LLM.
    */
-  private async generateReview(pr: any, files: PRFile[]): Promise<ReviewFinding[]> {
-    const prompt = this.buildReviewPrompt(pr, files);
+private async generateReview(pr: any, files: PRFile[]): Promise<ReviewFinding[]> {
+  const allFiles = files.length;
+  const reviewedFiles = files.slice(0, 15);
+  
+  // Warn if we're not reviewing everything
+  if (reviewedFiles.length < allFiles) {
+    console.warn(`⚠️  Only reviewing ${reviewedFiles.length} of ${allFiles} files due to limits`);
+  }
 
-    // This is the point of execution where the Ollama API is called.
-    // If the model name is wrong, the API call fails, and an error handler *outside* this function
-    // (but likely inside the main Probot framework loop) is probably creating a NEW provider instance
-    // with the hardcoded "codellama" string.
+  const prompt = this.buildReviewPrompt(pr, reviewedFiles);
+  
+  try {
     const response = await this.llm.generateReview(prompt);
+    console.log(`✓ Got response from LLM (${response.length} chars)`);
     
-    console.log(`\t✓ Got response from LLM (${response.length} chars)`);
-    return this.parseReviewResponse(response);
+    const findings = this.parseReviewResponse(response);
+    console.log(`✓ Parsed ${findings.length} finding(s)`);
+    
+    return findings;
+  } catch (error) {
+    console.error('Error generating review:', error);
+    throw error;
   }
-
-  /**
-   * Constructs the full prompt for the LLM.
-   */
-  private buildReviewPrompt(pr: any, files: PRFile[]): string {
-    const promptTemplate = this.loadPromptTemplate();
-
-    // Context for the review
-    let fileContext = '';
-    files.forEach(file => {
-      fileContext += `\n\n--- [FILE_START: ${file.filename} (Status: ${file.status})] ---\n`;
-      fileContext += file.patch || 'No code changes provided.';
-      fileContext += `\n--- [FILE_END: ${file.filename}] ---\n`;
-    });
-
-    const prompt = promptTemplate
-      .replace('[PR_TITLE]', pr.title)
-      .replace('[PR_BODY]', pr.body || 'No description provided.')
-      .replace('[FILE_CONTEXT]', fileContext);
-
-    return prompt;
-  }
-
+}
   /**
    * Loads the review prompt template from a file.
    */
   private loadPromptTemplate(): string {
-    // Assuming the prompt file is relative to the project root
-    const promptPath = path.resolve(process.cwd(), 'src/prompts/review-prompt.txt');
+    const agentContext = this.configLoader.getAgent('pr-review')?.context;
+    if (agentContext) {
+        return agentContext;
+    }
+
+    const promptPath = path.resolve(process.cwd(), 'src/prompts/pr-review.md');
+    
     try {
-      // NOTE: Using synchronous read for startup process simplicity
-      return this.configLoader.getAgent('pr-review')?.context || 
-             require('fs').readFileSync(promptPath, 'utf8');
-    } catch (e) {
-      console.warn(`Could not load prompt template from ${promptPath}. Using default context.`);
-      // Fallback context to prevent crash
+      return fs.readFileSync(promptPath, 'utf8');
+    } catch (e: any) {
+      console.warn(`Could not load prompt template from ${promptPath}: ${e.message}`);
       return `# PR Review Instructions\nFocus on the following areas:\n1. Security\n2. Bugs\n3. Performance\n\nReturn ONLY a JSON array.\n[FILE_CONTEXT]`;
     }
   }
@@ -194,16 +207,11 @@ export class ReviewEngine {
    * Parses the JSON response from the LLM.
    */
   private parseReviewResponse(response: string): ReviewFinding[] {
-    // 1. Aggressively clean up non-JSON boilerplate (Fix for 'Unexpected token F')
     let cleanResponse = response.trim();
     
-    // Remove markdown code fences (e.g., ```json or ```)
     cleanResponse = cleanResponse.replace(/^```(json)?\s*/i, '').replace(/\s*```$/, '');
-    
-    // Remove any trailing or leading quotes/placeholders the LLM might hallucinate
     cleanResponse = cleanResponse.replace(/^"|"$|^\[FILE_CONTEXT\]\s*/g, '');
     
-    // Fallback check: If the LLM returned nothing or garbage, treat it as an empty array
     if (!cleanResponse.trim().startsWith('[')) {
       console.warn(`LLM response did not start with '[' after cleanup. Raw response start: "${response.substring(0, 50)}"`);
       cleanResponse = '[]';
@@ -227,16 +235,19 @@ export class ReviewEngine {
     prNumber: number,
     sha: string,
     findings: ReviewFinding[]
-  ): Promise<void> {
+    ): Promise<void> {
     
-    // --- FIXED COMMENT FORMATTING ---
     const modelName = this.llm.getModelName();
     let body = `## 🤖 AI Code Review (${this.llm.name} (${modelName}))\n\n`;
-    // --------------------------------
 
-    body += `Found ${findings.length} issue${findings.length > 1 ? 's' : ''}. Severity breakdown:\n\n`;
+    if (filesSkipped > 0) {
+      body += `⚠️ **Note:** Reviewed ${filesReviewed} of ${totalFiles} files. `;
+      body += `${filesSkipped} files were too large or filtered out.\n\n`;
+    }
 
-    // Group findings by severity and category for the summary
+    // body += `Found ${findings.length} issue${findings.length > 1 ? 's' : ''}. Severity breakdown:\n\n`;
+    body += `Found ${findings.length} issue${findings.length > 1 ? 's' : ''}:\n\n`;
+
     const highFindings = findings.filter(f => f.severity === 'high');
     const mediumFindings = findings.filter(f => f.severity === 'medium');
 
@@ -256,14 +267,12 @@ export class ReviewEngine {
       body += '\n';
     }
 
-    // Prepare comments for line-by-line review
     const comments = findings.map(f => ({
       path: f.filename,
-      position: f.line || 1, // Default to line 1 if line number is missing
+      position: f.line || 1,
       body: `**[${f.severity.toUpperCase()} ${f.category.toUpperCase()}]** ${f.message}\n\n*Suggestion*: ${f.suggestion}`
     }));
     
-    // Post the detailed review
     await context.octokit.pulls.createReview({
       owner,
       repo: repoName,
