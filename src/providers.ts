@@ -15,7 +15,7 @@ export class OllamaProvider implements LLMProvider {
   ) {}
 
   getModelName(): string {
-    return `Ollama (${this.model})`;
+    return this.model;
   }
 
   async generateReview(prompt: string): Promise<string> {
