@@ -1,4 +1,7 @@
 // src/review-engine.ts
+import * as fs from 'fs';
+import * as path from 'path';
+import * as url from 'url';
 import { Context } from "probot";
 import { LLMProvider } from "./providers";
 
@@ -21,7 +24,37 @@ interface ReviewFinding {
 }
 
 export class ReviewEngine {
-  constructor(private llm: LLMProvider) {}
+  constructor(private llm: LLMProvider) {
+    // Check the directory structure relative to the compiled JS file
+    const __filename = url.fileURLToPath(import.meta.url); // <-- MISSING LINE 1
+    const __dirname = path.dirname(__filename);
+    const promptPath = path.resolve(__dirname, 'prompts', 'pr-review.md');
+    
+    console.log(`🔍 Attempting to load prompt from: ${promptPath}`);
+    
+    // --- New Verification Step ---
+    if (!fs.existsSync(promptPath)) {
+      console.error(`FATAL: Prompt file NOT FOUND at expected path. Check directory structure.`);
+      process.exit(1);
+    }
+    // -----------------------------
+    
+    try {
+      this.basePrompt = fs.readFileSync(promptPath, 'utf-8');
+      
+      // --- New Content Check ---
+      if (!this.basePrompt || this.basePrompt.length < 100) {
+        console.error(`FATAL: Prompt file is empty or too small (${this.basePrompt.length} bytes).`);
+        process.exit(1);
+      }
+      // -----------------------------
+      
+      console.log(`✅ Loaded prompt template (${this.basePrompt.length} bytes)`);
+    } catch (e) {
+      console.error(`FATAL: Could not read prompt file.`, e);
+      process.exit(1); 
+    }
+  }
 
   async reviewPR(context: Context<"pull_request.opened"> | Context<"pull_request.synchronize">, pr: any, repo: any): Promise<void> {
     const owner = repo.owner.login;
@@ -134,36 +167,13 @@ ${f.patch || 'No diff available'}
 \`\`\`
 `).join('\n---\n');
 
-    return `You are an expert code reviewer analyzing a pull request. Identify bugs, security vulnerabilities, performance issues, and best practice violations.
-
-# Pull Request
-**Title**: ${pr.title}
-**Description**: ${pr.body || 'No description'}
-**Author**: ${pr.user?.login}
-
-# Files Changed (${files.length})
-${fileContext}
-
-# Instructions
-Focus on:
-1. **Bugs**: Logic errors, null references, off-by-one, race conditions
-2. **Security**: SQL injection, XSS, secrets in code, insecure auth
-3. **Performance**: Inefficient algorithms, memory leaks, unnecessary loops
-4. **Best Practices**: Error handling, naming, code duplication
-
-Return ONLY a JSON array (no markdown, no explanation):
-[
-  {
-    "severity": "high",
-    "category": "security",
-    "filename": "src/auth.ts",
-    "line": 42,
-    "message": "Clear issue description",
-    "suggestion": "Specific fix"
-  }
-]
-
-Only include "high" or "medium" severity. If no issues: []`;
+    // Perform string replacement on the loaded template
+    return this.basePrompt
+      .replace('[PR_TITLE]', pr.title)
+      .replace('[PR_BODY]', pr.body || 'No description')
+      .replace('[PR_AUTHOR]', pr.user?.login)
+      .replace('[FILE_COUNT]', files.length.toString())
+      .replace('[FILE_CONTEXT]', fileContext);
   }
 
   private parseReviewResponse(response: string): ReviewFinding[] {
