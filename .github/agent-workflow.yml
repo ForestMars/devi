@@ -18,6 +18,7 @@ llm:
         - "qwen2.5-coder:7b"
         - "qwen2.5-coder:14b"
         - "qwen2.5-coder:32b"
+        - "deepseek-r1:latest"
         - "codellama"
     
     anthropic:
@@ -42,7 +43,7 @@ llm:
 # Agent Definitions
 agents:
   # Validates PRD structure (Connextra + Gherkin)
-  prd-review:
+  prd-agent:
     model: "ollama:qwen2.5-coder:7b"
     triggers:
       - event: "issues.opened"
@@ -54,7 +55,7 @@ agents:
       - add_label: "accepted"      # if validation passes
       
   # Crucibles feature requests, asks clarifying questions
-  feature-refinement:
+  refinement:
     model: "ollama:qwen2.5-coder:14b"
     context: "codebase"
     triggers:
@@ -86,6 +87,7 @@ agents:
   # Reviews code in PRs (what we built)
   pr-review:
     model: "ollama:qwen2.5-coder:7b"
+    # model: "ollama:deepseek-r1:latest"
     triggers:
       - event: "pull_request.opened"
       - event: "pull_request.synchronize"
