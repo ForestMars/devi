@@ -85,24 +85,6 @@ export class ReviewEngine { // FIX: Export is here
     const MAX_FILE_CHANGES = 800;
     const MAX_FILES = 15; 
 
-    const ignorePatterns = [
-      /\.gitignore$/,
-      /\.lock$/,
-      /package-lock\.json$/,
-      /yarn\.lock$/,
-      /bun\.lockb$/,
-      /\.min\.(js|css)$/,
-      /\.map$/,
-      /dist\//,
-      /build\//,
-      /node_modules\//,
-      /^README/i,
-      /\.md$/,
-      /\.rst$/,
-      /^LICENSE/i,
-      /^CHANGELOG/i
-    ];
-
     if (isFilteringEnabled) {
         console.log(`\nFILE FILTERING: (STRICT MODE - Max changes: ${MAX_FILE_CHANGES})`);
     } else {
