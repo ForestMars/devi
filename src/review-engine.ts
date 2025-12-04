@@ -1,135 +1,232 @@
-// src/review-engine-core.ts
+// src/review-engine.ts (Modified and Corrected Wrapper)
 
 import { Context } from 'probot';
+import { LLMProvider } from './providers';
+import { ConfigLoader } from './config-loader';
 import { ReviewEngineCore } from './review-engine-core';
 import { PRFile, ReviewFinding, FilterStats, PostReviewContext } from './review-engine-types';
+import * as path from 'path';
+import * as fs from 'fs';
 
-export class ReviewEngine {
-    private filePatches: Map<string, string>;
-    private context: PostReviewContext;
+export class ReviewEngine { // FIX: Export is here
+  private configLoader: ConfigLoader;
+  private filterStats?: FilterStats;
 
-    constructor(context: PostReviewContext, filesToReview: PRFile[]) {
-        this.context = context;
-        this.filePatches = new Map<string, string>(
-            filesToReview.map(f => [f.filename, f.patch || ''])
-        );
-    }
+  // FIX: This constructor is simple and does NOT contain the .map() logic,
+  // preventing the TypeError when the main app calls `new ReviewEngine()`.
+  constructor(private llm: LLMProvider) {
+    this.configLoader = new ConfigLoader();
+  }
 
-    private isLineInHunk(patch: string, line: number): boolean {
-        const hunkRegex = /@@ -\d+,\d+ \+(\d+),(\d+) @@/g;
-        let match;
+  async reviewPR(context: Context, pr: any, repo: any): Promise<void> {
+    const owner = repo.owner.login;
+    const repoName = repo.name;
+    const prNumber = pr.number;
+    const initialModelName = this.llm.getModelName();
+    
+    try {
+      const { data: files } = await context.octokit.pulls.listFiles({
+        owner,
+        repo: repoName,
+        pull_number: prNumber,
+        per_page: 100
+      });
+      
+      const filesToReview = this.filterFiles(files as PRFile[]);
+      
+      if (filesToReview.length === 0) {
+        console.log('✓ No reviewable files found.');
+        return;
+      }
+      
+      console.log(`[DEBUG_TRACE] 1. Initial LLM model: ${this.llm.getModelName()}`);
 
-        while ((match = hunkRegex.exec(patch)) !== null) {
-            const startLine = parseInt(match[1], 10);
-            const numLines = parseInt(match[2], 10);
+      const findings = await this.generateReview(pr, filesToReview);
+      
+      console.log(`[DEBUG_TRACE] 2. LLM model after generation: ${this.llm.getModelName()}`);
+      console.log(`✓ Parsed ${findings.length} finding(s)`);
 
-            if (line >= startLine && line < startLine + numLines) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    async postReview(
-        githubContext: Context,
-        owner: string,
-        repoName: string,
-        prNumber: number,
-        sha: string,
-        findings: ReviewFinding[]
-    ): Promise<void> {
-        const modelName = this.context.modelName;
-        let body = `## 🤖 AI Code Review (${this.context.llmName} (${modelName}))\n\n`;
-        
-        // --- Reporting Coverage Statistics ---
-        if (this.context.filterStats && (this.context.filterStats.ignored > 0 || this.context.filterStats.tooLarge > 0)) {
-            body += `📊 **Coverage:** Reviewed ${this.context.filterStats.reviewed} of ${this.context.filterStats.total} files`;
-            const skipped = [];
-            if (this.context.filterStats.ignored > 0) skipped.push(`${this.context.filterStats.ignored} config/docs`);
-            if (this.context.filterStats.tooLarge > 0) skipped.push(`${this.context.filterStats.tooLarge} too large`);
-            
-            if (skipped.length > 0) {
-                body += ` (${skipped.join(', ')})`;
-            }
-            
-            body += `\n\n`;
-        }
-        
-        body += `Found ${findings.length} issue${findings.length !== 1 ? 's' : ''}:\n\n`;
-        const highFindings = findings.filter(f => f.severity === 'high');
-        const mediumFindings = findings.filter(f => f.severity === 'medium');
-
-        // --- High Priority Findings ---
-        if (highFindings.length > 0) {
-            body += `### 🔴 High Priority (${highFindings.length})\n`;
-            highFindings.forEach(f => {
-                body += `* [${f.category.toUpperCase()}] **${f.filename}${f.line ? `:${f.line}` : ''}**: ${f.message}\n`;
-            });
-            body += '\n';
-        }
-        
-        // --- Medium Priority Findings ---
-        if (mediumFindings.length > 0) {
-            body += `### 🟡 Medium Priority (${mediumFindings.length})\n`;
-            mediumFindings.forEach(f => {
-                body += `* [${f.category.toUpperCase()}] **${f.filename}${f.line ? `:${f.line}` : ''}**: ${f.message}\n`;
-            });
-            body += '\n';
-        }
-
-        // --- Prepare Inline Comments ---
-        const comments = findings
-            .filter(f => f.line !== undefined)
-            .filter(f => {
-                const line = f.line!;
-                const patch = this.filePatches.get(f.filename);
-                
-                if (!patch) {
-                    console.warn(`[VALIDATION_SKIP] Patch not found for ${f.filename}. Skipping inline comment.`);
-                    return false;
-                }
-
-                if (line <= 0) {
-                    console.warn(`[VALIDATION_FAIL] Skipping finding for ${f.filename}:${line}. Line number is invalid.`);
-                    return false;
-                }
-
-                if (!this.isLineInHunk(patch, line)) {
-                    console.warn(`[VALIDATION_FAIL] Skipping finding for ${f.filename}:${line}. Line not found in patch hunk range.`);
-                    return false;
-                }
-                
-                console.log(`[VALIDATION_SUCCESS] Posting comment on ${f.filename}:${line}.`);
-                return true; 
-            })
-            .map(f => ({
-                path: f.filename,
-                line: f.line,  
-                side: 'RIGHT' as const,
-                body: `**[${f.severity.toUpperCase()} ${f.category.toUpperCase()}]** ${f.message}\n\n*Suggestion*: ${f.suggestion}`
-            }));
-
-        // --- Post Review or Comment ---
-        if (comments.length === 0 && findings.length > 0) {
-            await githubContext.octokit.issues.createComment({
-                owner,
-                repo: repoName,
-                issue_number: prNumber,
-                body: body
-            });
-            return;
-        } else if (comments.length === 0 && findings.length === 0) {
-             return; 
-        }
-
-        await githubContext.octokit.pulls.createReview({
-            owner,
-            repo: repoName,
-            pull_number: prNumber,
-            commit_id: sha,
-            body: body,
-            event: highFindings.length > 0 ? 'REQUEST_CHANGES' : 'COMMENT',
-            comments: comments
+      const coreContext: PostReviewContext = {
+          llmName: this.llm.name,
+          modelName: this.llm.getModelName(),
+          filterStats: this.filterStats
+      };
+      
+      // The ReviewEngineCore is instantiated *after* filesToReview has been filtered
+      // and is correctly passed the necessary arguments.
+      const core = new ReviewEngineCore(coreContext, filesToReview);
+      
+      if (findings.length > 0) {
+        await core.postReview(context, owner, repoName, prNumber, pr.head.sha, findings);
+      } else {
+        console.log('✓ No issues found');
+        const modelName = this.llm.getModelName();
+        await context.octokit.issues.createComment({
+          owner,
+          repo: repoName,
+          issue_number: prNumber,
+          body: `## 🤖 AI Code Review (${this.llm.name} (${modelName}))\n\n✅ No significant issues found. Code looks good!`
         });
+      }
+      console.log('✅ Review complete!');
+    } catch (error: any) {
+      console.error(`🔴 Fatal error during review for PR #${prNumber}: ${error.message}`);
+      await context.octokit.issues.createComment({
+        owner,
+        repo: repoName,
+        issue_number: prNumber,
+        body: `## 🤖 AI Code Review (${this.llm.name} (${initialModelName}))\n\n❌ Review failed due to internal error: \n\`\`\`\n${error.message}\n\`\`\``
+      });
     }
+  }
+
+  private filterFiles(files: any[]): PRFile[] {
+    const ignorePatterns = [
+      /\.gitignore$/,
+      /\.lock$/,
+      /package-lock\.json$/,
+      /yarn\.lock$/,
+      /bun\.lockb$/,
+      /\.min\.(js|css)$/,
+      /\.map$/,
+      /dist\//,
+      /build\//,
+      /node_modules\//,
+      /^README/i,
+      /\.md$/,
+      /\.rst$/,
+      /^LICENSE/i,
+      /^CHANGELOG/i
+    ];
+
+    const MAX_FILE_CHANGES = 800;
+    const MAX_FILES = 15; 
+
+    console.log(`\nFILE FILTERING:`);
+    console.log(`Total files in PR: ${files.length}`);
+    const stats: FilterStats = {
+      total: files.length,
+      reviewed: 0,
+      ignored: 0,
+      tooLarge: 0
+    };  
+    const filtered = files.filter(f => {
+      if (ignorePatterns.some(pattern => pattern.test(f.filename))) {
+        console.log(`✗ IGNORED: ${f.filename} (matched ignore pattern)`);
+        stats.ignored++;
+        return false;
+      }
+      if (f.changes >= MAX_FILE_CHANGES) {
+        console.log(`✗ TOO LARGE: ${f.filename} (${f.changes} changes, limit: ${MAX_FILE_CHANGES})`);
+        stats.tooLarge++;
+        return false;
+      }
+      console.log(`✓ INCLUDED: ${f.filename} (${f.changes} changes)`);
+      return true;
+    });
+    const result = filtered.slice(0, MAX_FILES);
+    stats.reviewed = result.length;
+    if (filtered.length > MAX_FILES) {
+      console.log(`WARNING: Truncated to first ${MAX_FILES} files (had ${filtered.length})`);
+    }
+    console.log(`FINAL: Reviewing ${result.length} of ${files.length} files\n`);
+    this.filterStats = stats;
+
+    return result as PRFile[];
+  }
+
+  private async generateReview(pr: any, files: PRFile[]): Promise<ReviewFinding[]> {
+    const BATCH_SIZE = 1; 
+    const allFindings: ReviewFinding[] = [];
+    console.log(`📦 Splitting ${files.length} files into batches of ${BATCH_SIZE}`);
+    for (let i = 0; i < files.length; i += BATCH_SIZE) {
+      const batch = files.slice(i, i + BATCH_SIZE);
+      const batchNum = Math.floor(i / BATCH_SIZE) + 1;
+      const totalBatches = Math.ceil(files.length / BATCH_SIZE);
+      console.log(`\n📦 Reviewing batch ${batchNum}/${totalBatches} (${batch.length} files):`);
+      batch.forEach(f => console.log(`   - ${f.filename}`));
+      const prompt = this.buildReviewPrompt(pr, batch);
+      console.log(`📏 Batch prompt: ${prompt.length} chars`);
+      try {
+        const response = await this.llm.generateReview(prompt); 
+        
+        console.log(`✓ Got response (${response.length} chars)`);
+        console.log(`[DEBUG_RAW_OUTPUT] Response Snippet (500 chars): ${response.substring(0, 500).trim()}`);
+        
+        const findings = this.parseReviewResponse(response);
+        console.log(`✓ Found ${findings.length} issue(s) in this batch`);
+        
+        allFindings.push(...findings);
+      } catch (error) {
+        console.error(`❌ Error in batch ${batchNum}:`, error);
+      }
+    }
+    console.log(`\n✅ Total findings across all batches: ${allFindings.length}`);
+    return allFindings;
+  }
+
+  private buildReviewPrompt(pr: any, files: PRFile[]): string {
+    const template = this.loadPromptTemplate();
+    
+    const fileContext = files.map(f => `
+### File: ${f.filename} (${f.status})
+**Changes**: +${f.additions}/-${f.deletions} lines
+\`\`\`diff
+${f.patch || 'No diff available'}
+\`\`\`
+`).join('\n---\n');
+    return template
+      .replace('[PR_TITLE]', pr.title || 'No title')
+      .replace('[PR_BODY]', pr.body || 'No description')
+      .replace('[PR_AUTHOR]', pr.user?.login || 'unknown')
+      .replace('[FILE_COUNT]', files.length.toString())
+      .replace('[FILE_CONTEXT]', fileContext);
+  }
+
+  private loadPromptTemplate(): string {
+    const agentContext = this.configLoader.getAgent('pr-review')?.context;
+    if (agentContext) {
+        return agentContext;
+    }
+
+    const promptPath = path.resolve(process.cwd(), 'src/prompts/pr-review.md');
+    try {
+      return fs.readFileSync(promptPath, 'utf8');
+    } catch (e: any) {
+      console.warn(`Could not load prompt template from ${promptPath}: ${e.message}`);
+      return `# PR Review Instructions\nFocus on the following areas:\n1. Security\n2. Bugs\n3. Performance\n\nReturn ONLY a JSON array.\n[FILE_CONTEXT]`;
+    }
+  }
+
+  private parseReviewResponse(rawResponse: string): ReviewFinding[] {
+    let jsonString = rawResponse.trim();
+    if (jsonString.startsWith('```')) {
+      const firstFenceEnd = jsonString.indexOf('\n');
+      if (firstFenceEnd !== -1) {
+        jsonString = jsonString.substring(firstFenceEnd).trim();
+      }
+    }
+    if (jsonString.endsWith('```')) {
+      const lastFenceStart = jsonString.lastIndexOf('```');
+      if (lastFenceStart !== -1) {
+        jsonString = jsonString.substring(0, lastFenceStart).trim();
+      }
+    }
+    const start = jsonString.indexOf('[');
+    const end = jsonString.lastIndexOf(']');
+    if (start === -1 || end === -1 || start >= end) {
+      console.error(`🔴 PARSE FAIL: Cannot find valid array boundaries in response.`);
+      console.error(`RAW RESPONSE SNIPPET: ${jsonString.substring(0, 500)}`);
+      return [];
+    }
+    const arrayContent = jsonString.substring(start, end + 1);
+    console.log(`[DEBUG_PARSE_B] Guardrail Array Content: ${arrayContent.substring(0, 100)}...`);
+    try {
+      return JSON.parse(arrayContent) as ReviewFinding[];
+    } catch (error) {
+      console.error('🔴 PARSE FAIL: JSON syntax error after guardrail applied.', error);
+      console.error(`[DEBUG_PARSE_C] Failed String: ${arrayContent.substring(0, 500)}...`);
+      return [];
+    }
+  }
 }
