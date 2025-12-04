@@ -9,13 +9,13 @@ export class ReviewEngineCore {
 
     constructor(context: PostReviewContext, filesToReview: PRFile[]) {
         this.context = context;
+        // This is the correct location for the .map() call
         this.filePatches = new Map<string, string>(
             filesToReview.map(f => [f.filename, f.patch || ''])
         );
     }
 
     private isLineInHunk(patch: string, line: number): boolean {
-        // Validation logic to ensure the line number is part of the diff hunk
         const hunkRegex = /@@ -\d+,\d+ \+(\d+),(\d+) @@/g;
         let match;
 
