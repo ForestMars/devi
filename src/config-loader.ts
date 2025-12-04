@@ -42,18 +42,28 @@ export interface Trigger {
 
 export class ConfigLoader {
   private config: AgentConfig | null = null;
+  
+  // New private property to hold the config directory root
+  private configDirRoot: string;
 
-  constructor(private configPath: string = '.github/agent-workflow.yml') {
-    this.configPath = path.resolve(process.cwd(), 'config');
+  // The main config file is now assumed to be inside the config directory
+  private configFile: string = 'agent-workflow.yml';
+
+  constructor(baseDir: string = 'config') {
+    this.configDirRoot = path.resolve(process.cwd(), baseDir);
+    this.configPath = path.join(this.configDirRoot, this.configFile);
     this.loadEnvironmentVariables();
-    const __filename = url.fileURLToPath(import.meta.url);
-    const __dirname = path.dirname(__filename);
-    // Go up ONE level: src/ -> pedal/
-    this.configPath = path.join(__dirname, '..', this.configPath);
-  }
-  private loadEnvironmentVariables(): void {
-    const envAgentPath = path.join(this.configPath, 'env');
 
+    // this.configPath = path.resolve(process.cwd(), 'config');
+    // this.loadEnvironmentVariables();
+    // const __filename = url.fileURLToPath(import.meta.url);
+    // const __dirname = path.dirname(__filename);
+    // Go up ONE level: src/ -> pedal/
+    // this.configPath = path.join(__dirname, '..', this.configPath);
+  }
+
+  private loadEnvironmentVariables(): void {
+    const envAgentPath = path.join(this.configDirRoot, '.env.agent'); 
     try {
         dotenv.config({ path: envAgentPath, override: true });
         console.log(`✅ Loaded agent configuration from ${envAgentPath}`);
@@ -61,6 +71,7 @@ export class ConfigLoader {
         console.warn(`Could not load ${envAgentPath}. Proceeding without it.`);
     }
   }
+
   // Load and parse the YAML config file
   load(): AgentConfig {
     if (this.config) {
@@ -273,7 +284,8 @@ export class ConfigLoader {
    * @returns An array of RegExp objects
    */
   public getIgnorePatterns(): RegExp[] {
-    const filePath = path.join(this.configPath, 'ignore-files.txt');
+    // const filePath = path.join(this.configPath, 'ignore-files.txt');
+    const filePath = path.join(this.configDirRoot, 'ignore-files.txt');
     
     try {
       const content = fs.readFileSync(filePath, 'utf8');
@@ -297,7 +309,7 @@ export class ConfigLoader {
       return []; 
     }
   }
-  
+
   /**
    * Get current sprint number
    */
