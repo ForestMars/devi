@@ -81,7 +81,7 @@ export class ReviewEngine {
       console.log(`✓ Parsed ${findings.length} finding(s)`);
 
       if (findings.length > 0) {
-        await this.postReview(context, owner, repoName, prNumber, pr.head.sha, findings);
+        await this.postReview(context, owner, repoName, prNumber, pr.head.sha, findings, filesToReview);
       } else {
         console.log('✓ No issues found');
         
@@ -113,6 +113,7 @@ export class ReviewEngine {
    */
   private filterFiles(files: any[]): PRFile[] {
     const ignorePatterns = [
+      /\.gitignore$/,
       /\.lock$/,
       /package-lock\.json$/,
       /yarn\.lock$/,
@@ -130,6 +131,12 @@ export class ReviewEngine {
       /^CHANGELOG/i
     ];
 
+// ANSI Color Codes
+    const COLOR_RESET = '\x1b[0m';
+    const COLOR_RED = '\x1b[31m';
+    const COLOR_GREEN = '\x1b[32m';
+    const COLOR_YELLOW = '\x1b[33m'; // Used for warnings
+
     const MAX_FILE_CHANGES = 800;
     const MAX_FILES = 15;
 
@@ -145,18 +152,21 @@ export class ReviewEngine {
 
     const filtered = files.filter(f => {
       if (ignorePatterns.some(pattern => pattern.test(f.filename))) {
-        console.log(`   ✗ IGNORED: ${f.filename} (matched ignore pattern)`);
+        // Log IGNORED in RED
+        console.log(`   ✗ ${COLOR_RED}IGNORED${COLOR_RESET}: ${f.filename} (matched ignore pattern)`);
         stats.ignored++;
         return false;
       }
       
       if (f.changes >= MAX_FILE_CHANGES) {
-        console.log(`   ✗ TOO LARGE: ${f.filename} (${f.changes} changes, limit: ${MAX_FILE_CHANGES})`);
+        // Log TOO LARGE in RED
+        console.log(`   ✗ ${COLOR_RED}TOO LARGE${COLOR_RESET}: ${f.filename} (${f.changes} changes, limit: ${MAX_FILE_CHANGES})`);
         stats.tooLarge++;
         return false;
       }
       
-      console.log(`   ✓ INCLUDED: ${f.filename} (${f.changes} changes)`);
+      // Log INCLUDED in GREEN
+      console.log(`   ✓ ${COLOR_GREEN}INCLUDED${COLOR_RESET}: ${f.filename} (${f.changes} changes)`);
       return true;
     });
 
@@ -164,7 +174,8 @@ export class ReviewEngine {
     stats.reviewed = result.length;
 
     if (filtered.length > MAX_FILES) {
-      console.log(`   ⚠️  WARNING: Truncated to first ${MAX_FILES} files (had ${filtered.length})`);
+      // Log truncation warning in YELLOW
+      console.log(`${COLOR_YELLOW}   ⚠️  WARNING: Truncated to first ${MAX_FILES} files (had ${filtered.length})${COLOR_RESET}`);
     }
 
     console.log(`\n   📋 FINAL: Reviewing ${result.length} of ${files.length} files\n`);
@@ -177,29 +188,44 @@ export class ReviewEngine {
   /**
    * Generates the review by calling the LLM.
    */
-  private async generateReview(pr: any, files: PRFile[]): Promise<ReviewFinding[]> {
-    const allFiles = files.length;
-    const reviewedFiles = files.slice(0, 15);
-    
-    if (reviewedFiles.length < allFiles) {
-      console.warn(`⚠️  Only reviewing ${reviewedFiles.length} of ${allFiles} files due to limits`);
-    }
 
-    const prompt = this.buildReviewPrompt(pr, reviewedFiles);
+private async generateReview(pr: any, files: PRFile[]): Promise<ReviewFinding[]> {
+  const BATCH_SIZE = 1; // <<< CHANGED FROM 3 TO 1
+  const allFindings: ReviewFinding[] = [];
+  
+  console.log(`📦 Splitting ${files.length} files into batches of ${BATCH_SIZE}`);
+  
+  for (let i = 0; i < files.length; i += BATCH_SIZE) {
+    const batch = files.slice(i, i + BATCH_SIZE);
+    const batchNum = Math.floor(i / BATCH_SIZE) + 1;
+    const totalBatches = Math.ceil(files.length / BATCH_SIZE);
+    
+    //console.log(`\n📦 Reviewing batch ${batchNum}/${totalBatches} (${batch.length}  
+    console.log(`\n📦 Reviewing batch ${batchNum}/${totalBatches} (${batch.length} files):`);
+
+    batch.forEach(f => console.log(`   - ${f.filename}`));
+    
+    const prompt = this.buildReviewPrompt(pr, batch);
+    console.log(`📏 Batch prompt: ${prompt.length} chars`);
     
     try {
       const response = await this.llm.generateReview(prompt);
-      console.log(`✓ Got response from LLM (${response.length} chars)`);
+      console.log(`✓ Got response (${response.length} chars)`);
       
       const findings = this.parseReviewResponse(response);
-      console.log(`✓ Parsed ${findings.length} finding(s)`);
+      console.log(`✓ Found ${findings.length} issue(s) in this batch`);
       
-      return findings;
+      allFindings.push(...findings);
     } catch (error) {
-      console.error('Error generating review:', error);
-      throw error;
+      console.error(`❌ Error in batch ${batchNum}:`, error);
+      // Continue with next batch instead of failing entirely
     }
   }
+  
+  console.log(`\n✅ Total findings across all batches: ${allFindings.length}`);
+  return allFindings;
+}
+
 
   /**
    * Builds the review prompt by injecting PR data into the template.
@@ -274,8 +300,13 @@ ${f.patch || 'No diff available'}
     repoName: string,
     prNumber: number,
     sha: string,
-    findings: ReviewFinding[]
+    findings: ReviewFinding[],
+    filesToReview: PRFile[]
   ): Promise<void> {
+
+    const filePatches = new Map<string, string>(
+        filesToReview.map(f => [f.filename, f.patch || ''])
+    );
     
     const modelName = this.llm.getModelName();
     let body = `## 🤖 AI Code Review (${this.llm.name} (${modelName}))\n\n`;
@@ -315,12 +346,25 @@ ${f.patch || 'No diff available'}
       body += '\n';
     }
 
-    const comments = findings.map(f => ({
-      path: f.filename,
-      position: f.line || 1,
-      body: `**[${f.severity.toUpperCase()} ${f.category.toUpperCase()}]** ${f.message}\n\n*Suggestion*: ${f.suggestion}`
-    }));
-    
+    const comments = findings
+      .filter(f => f.line !== undefined)  // Only comments with line numbers
+      .map(f => ({
+        path: f.filename,
+        line: f.line,  // Use 'line' not 'position' for single-line comments
+        side: 'RIGHT',
+        body: `**[${f.severity.toUpperCase()} ${f.category.toUpperCase()}]** ${f.message}\n\n*Suggestion*: ${f.suggestion}`
+      }));
+
+    // If no valid inline comments, just post summary
+    if (comments.length === 0) {
+      await context.octokit.issues.createComment({
+        owner,
+        repo: repoName,
+        issue_number: prNumber,
+        body: body
+      });
+      return;
+    }
     await context.octokit.pulls.createReview({
       owner,
       repo: repoName,
