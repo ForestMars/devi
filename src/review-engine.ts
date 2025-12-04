@@ -10,6 +10,7 @@ const MAX_FILE_SIZE_KB = 512;
 const MAX_CHANGES_PER_FILE = 999;
 const MAX_FILES_TO_REVIEW = 19;
 
+
 interface PRFile {
   sha: string;
   filename: string;
@@ -189,43 +190,44 @@ export class ReviewEngine {
    * Generates the review by calling the LLM.
    */
 
-private async generateReview(pr: any, files: PRFile[]): Promise<ReviewFinding[]> {
-  const BATCH_SIZE = 1; // <<< CHANGED FROM 3 TO 1
-  const allFindings: ReviewFinding[] = [];
-  
-  console.log(`📦 Splitting ${files.length} files into batches of ${BATCH_SIZE}`);
-  
-  for (let i = 0; i < files.length; i += BATCH_SIZE) {
-    const batch = files.slice(i, i + BATCH_SIZE);
-    const batchNum = Math.floor(i / BATCH_SIZE) + 1;
-    const totalBatches = Math.ceil(files.length / BATCH_SIZE);
+  private async generateReview(pr: any, files: PRFile[]): Promise<ReviewFinding[]> {
+    const BATCH_SIZE = 1; 
+    const allFindings: ReviewFinding[] = [];
     
-    //console.log(`\n📦 Reviewing batch ${batchNum}/${totalBatches} (${batch.length}  
-    console.log(`\n📦 Reviewing batch ${batchNum}/${totalBatches} (${batch.length} files):`);
+    console.log(`📦 Splitting ${files.length} files into batches of ${BATCH_SIZE}`);
+    
+    for (let i = 0; i < files.length; i += BATCH_SIZE) {
+      const batch = files.slice(i, i + BATCH_SIZE);
+      const batchNum = Math.floor(i / BATCH_SIZE) + 1;
+      const totalBatches = Math.ceil(files.length / BATCH_SIZE);
+      
+      console.log(`\n📦 Reviewing batch ${batchNum}/${totalBatches} (${batch.length} files):`);
 
-    batch.forEach(f => console.log(`   - ${f.filename}`));
-    
-    const prompt = this.buildReviewPrompt(pr, batch);
-    console.log(`📏 Batch prompt: ${prompt.length} chars`);
-    
-    try {
-      const response = await this.llm.generateReview(prompt);
-      console.log(`✓ Got response (${response.length} chars)`);
+      batch.forEach(f => console.log(`   - ${f.filename}`));
       
-      const findings = this.parseReviewResponse(response);
-      console.log(`✓ Found ${findings.length} issue(s) in this batch`);
+      const prompt = this.buildReviewPrompt(pr, batch);
+      console.log(`📏 Batch prompt: ${prompt.length} chars`);
       
-      allFindings.push(...findings);
-    } catch (error) {
-      console.error(`❌ Error in batch ${batchNum}:`, error);
-      // Continue with next batch instead of failing entirely
+      try {
+        // --- CRITICAL FIX: Pass a configuration object with a high max_tokens value. ---
+        // This forces the LLM to allocate enough budget to write out a large JSON array (10-15 findings).
+        const response = await this.llm.generateReview(prompt, { max_tokens: 3000 });
+        // -------------------------------------------------------------------------------
+        console.log(`✓ Got response (${response.length} chars)`);
+        
+        const findings = this.parseReviewResponse(response);
+        console.log(`✓ Found ${findings.length} issue(s) in this batch`);
+        
+        allFindings.push(...findings);
+      } catch (error) {
+        console.error(`❌ Error in batch ${batchNum}:`, error);
+        // Continue with next batch instead of failing entirely
+      }
     }
+    
+    console.log(`\n✅ Total findings across all batches: ${allFindings.length}`);
+    return allFindings;
   }
-  
-  console.log(`\n✅ Total findings across all batches: ${allFindings.length}`);
-  return allFindings;
-}
-
 
   /**
    * Builds the review prompt by injecting PR data into the template.
@@ -273,24 +275,67 @@ ${f.patch || 'No diff available'}
    * Parses the JSON response from the LLM.
    */
   private parseReviewResponse(response: string): ReviewFinding[] {
+    
     let cleanResponse = response.trim();
     
+    // 1. Initial cleanup: remove common markdown fences
     cleanResponse = cleanResponse.replace(/^```(json)?\s*/i, '').replace(/\s*```$/, '');
-    cleanResponse = cleanResponse.replace(/^"|"$|^\[FILE_CONTEXT\]\s*/g, '');
+
+    // 2. Find the JSON array boundaries (The Ultimate Guardrail)
+    const firstBracket = cleanResponse.indexOf('[');
+    const lastBracket = cleanResponse.lastIndexOf(']');
+
+    if (firstBracket === -1 || lastBracket === -1 || lastBracket < firstBracket) {
+        // This proves the LLM failed to output a recognizable JSON array.
+        console.error(`🔴 PARSE FAIL: Cannot find valid array boundaries in response.`);
+        console.error(`   RAW RESPONSE SNIPPET: "${response.trim().substring(0, 200)}"`);
+        return []; 
+    }
     
-    if (!cleanResponse.trim().startsWith('[')) {
-      console.warn(`LLM response did not start with '[' after cleanup. Raw response start: "${response.substring(0, 50)}"`);
-      cleanResponse = '[]';
+    // 3. Extract ONLY the content between the first [ and last ]
+    let jsonContent = cleanResponse.substring(firstBracket, lastBracket + 1); 
+
+    // --- DEBUG LOG B: Check if the Guardrail isolated the array correctly ---
+    console.log(`[DEBUG_PARSE_B] Guardrail Array Content: "${jsonContent.substring(0, 100)}"`);
+    // ------------------------------------------------------------------------
+
+    // 4. Clean up potential trailing commas (common LLM error)
+    try {
+        if (jsonContent.endsWith(',]')) {
+             jsonContent = jsonContent.slice(0, -2) + ']';
+        }
+    } catch (e) {
+        // Ignore this if it fails
     }
 
     try {
-      return JSON.parse(cleanResponse);
-    } catch (error) {
-      console.error(`Failed to parse clean response: "${cleanResponse.substring(0, 100)}"`);
-      throw error;
+      const findings = JSON.parse(jsonContent);
+      
+      // 5. Final validation: Ensure the parsed result is actually an array
+      if (Array.isArray(findings)) {
+          return findings;
+      }
+      
+      console.error(`🔴 PARSE FAIL: JSON was valid but did not result in an array.`);
+      return [];
+      
+    } catch (error: any) {
+      // --- DEBUG LOG C: Log the exact string that failed JSON.parse() ---
+      console.error(`❌ FAILED TO PARSE JSON. Error: ${error.message}`);
+      console.error(`[DEBUG_PARSE_C] Failed String: "${jsonContent.substring(0, 100)}"`);
+      // --------------------------------------------------------------------
+      return []; 
     }
   }
 
+  /**
+   * Posts the final review summary and line comments.
+   */
+  // src/review-engine.ts (Replacing postReview method)
+
+  /**
+   * Posts the final review summary and line comments.
+   */
   /**
    * Posts the final review summary and line comments.
    */
@@ -346,14 +391,57 @@ ${f.patch || 'No diff available'}
       body += '\n';
     }
 
+    // --- CRITICAL VALIDATION AND FILTERING ---
     const comments = findings
-      .filter(f => f.line !== undefined)  // Only comments with line numbers
+      .filter(f => f.line !== undefined) // 1. Must have a line number
+      .filter(f => {
+        const line = f.line!;
+        const patch = filePatches.get(f.filename);
+        
+        if (!patch) {
+            console.warn(`[VALIDATION_SKIP] Patch not found for ${f.filename}. Skipping inline comment.`);
+            return false;
+        }
+
+        // 2. Strict Check: Ensure line number is > 0
+        if (line <= 0) {
+            console.warn(`[VALIDATION_FAIL] Skipping finding for ${f.filename}:${line}. Line number is invalid.`);
+            return false;
+        }
+
+        // 3. Containment Check: Search for the line number in the diff hunk ranges.
+        // This validates if the line number falls within any added/modified hunk range in the patch.
+        // The regex captures the starting line number and the number of lines added (+100,5 -> [1]=100, [2]=5)
+        const hunkRegex = /@@ -\d+,\d+ \+(\d+),(\d+) @@/g;
+        let match;
+        let isValidHunkLine = false;
+
+        while ((match = hunkRegex.exec(patch)) !== null) {
+            const startLine = parseInt(match[1], 10);
+            const numLines = parseInt(match[2], 10);
+            
+            // Check if the finding line is between the hunk start line and (start + number of lines - 1)
+            if (line >= startLine && line < startLine + numLines) {
+                isValidHunkLine = true;
+                break;
+            }
+        }
+
+        if (!isValidHunkLine) {
+            console.warn(`[VALIDATION_FAIL] Skipping finding for ${f.filename}:${line}. Line not found in patch hunk range.`);
+            return false;
+        }
+        
+        console.log(`[VALIDATION_SUCCESS] Posting comment on ${f.filename}:${line}.`);
+        return true; 
+      })
       .map(f => ({
         path: f.filename,
-        line: f.line,  // Use 'line' not 'position' for single-line comments
-        side: 'RIGHT',
+        line: f.line,  
+        side: 'RIGHT' as const,
         body: `**[${f.severity.toUpperCase()} ${f.category.toUpperCase()}]** ${f.message}\n\n*Suggestion*: ${f.suggestion}`
       }));
+    // ------------------------------------------
 
     // If no valid inline comments, just post summary
     if (comments.length === 0) {
@@ -365,6 +453,8 @@ ${f.patch || 'No diff available'}
       });
       return;
     }
+    
+    // Post the review with the filtered, valid comments
     await context.octokit.pulls.createReview({
       owner,
       repo: repoName,
