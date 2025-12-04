@@ -1,10 +1,9 @@
 // src/review-engine-core.ts
 
 import { Context } from 'probot';
-import { ReviewEngineCore } from './review-engine-core';
-import { PRFile, ReviewFinding, FilterStats, PostReviewContext } from './review-engine-types';
+import { PRFile, ReviewFinding, PostReviewContext } from './review-engine-types';
 
-export class ReviewEngine {
+export class ReviewEngineCore {
     private filePatches: Map<string, string>;
     private context: PostReviewContext;
 
@@ -16,6 +15,7 @@ export class ReviewEngine {
     }
 
     private isLineInHunk(patch: string, line: number): boolean {
+        // Validation logic to ensure the line number is part of the diff hunk
         const hunkRegex = /@@ -\d+,\d+ \+(\d+),(\d+) @@/g;
         let match;
 
