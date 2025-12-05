@@ -32,14 +32,9 @@ export class OllamaProvider implements LLMProvider {
         prompt: prompt,
         stream: false,
         options: {
-          temperature: 0.3,
-          num_predict: this.maxOutputTokens, // Uses configured value (4096)
+          temperature: 1.5,
+          num_predict: this.maxOutputTokens // Uses configured value (4096)
           // stop: ["\n]"] // CRITICAL FIX for Qwen truncation (stops output after closing JSON array)
-          // stop: ["\n```", "```", "]"]
-          stop: [
-            "```",  
-            "\n```"
-          ]
         }
       })
     });
