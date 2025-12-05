@@ -6,7 +6,9 @@ Setup
 ******
 
 This document outlines the steps required to set up the project both locally and for integration with GitHub.
-This project, `ForestMars/devi`, operates as a PR review agent powered by Ollama.
+This project, `ForestMars/pedal-dev`, operates as a PR review agent powered by Ollama.
+
+
 
 ---
 

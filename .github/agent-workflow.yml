@@ -1,0 +1,144 @@
+# .github/agent-workflow.yml
+version: "1.0"
+
+# Global settings
+settings:
+  current_sprint: 48  # Week of year (or manually set)
+  sprint_label_prefix: "sprint-"
+
+# LLM Provider Configuration
+llm:
+  default_provider: "ollama"
+  default_model: "qwen2.5-coder:7b"
+  
+  providers:
+    ollama:
+      host: "http://localhost:11434"
+      models:
+        - "qwen2.5-coder:7b"
+        - "qwen2.5-coder:14b"
+        - "qwen2.5-coder:32b"
+        - "deepseek-r1:latest"
+        - "codellama"
+    
+    anthropic:
+      api_key_env: "ANTHROPIC_API_KEY"
+      models:
+        - "claude-sonnet-4-20250514"
+        - "claude-opus-4-20250514"
+    
+    openrouter:
+      api_key_env: "OPENROUTER_API_KEY"
+      base_url: "https://openrouter.ai/api/v1"
+      models:
+        - "anthropic/claude-sonnet-4"
+        - "google/gemini-pro-1.5"
+        - "qwen/qwen-2.5-coder-32b-instruct"
+    
+    google:
+      api_key_env: "GOOGLE_API_KEY"
+      models:
+        - "gemini-2.0-flash-exp"
+
+# Agent Definitions
+agents:
+  # Validates PRD structure (Connextra + Gherkin)
+  prd-agent:
+    model: "ollama:qwen2.5-coder:7b"
+    triggers:
+      - event: "issues.opened"
+        conditions:
+          labels_all: ["refinement", "prd"]
+    actions:
+      - validate_prd_structure
+      - add_label: "needs-review"  # if validation fails
+      - add_label: "accepted"      # if validation passes
+      
+  # Crucibles feature requests, asks clarifying questions
+  refinement:
+    model: "ollama:qwen2.5-coder:14b"
+    context: "codebase"
+    triggers:
+      - event: "issues.opened"
+        conditions:
+          labels_all: ["refinement"]
+          labels_any: ["feature", "enhancement"]
+    actions:
+      - find_related_prd
+      - crucible_questions
+      - add_label: "product-question"  # if has questions
+      - add_label: "accepted"          # if ready
+      
+  # Creates branch and implements first pass
+  implementation:
+    model: "ollama:qwen2.5-coder:32b"
+    context: "codebase"
+    triggers:
+      - event: "issues.labeled"
+        conditions:
+          label_added: "scheduled"
+          current_sprint_match: true
+    actions:
+      - create_branch: "devi.{issue_number}.{brief_description}"
+      - implement_first_pass
+      - create_pr
+      - link_pr_to_issue
+      
+  # Reviews code in PRs (what we built)
+  pr-review:
+    model: "ollama:qwen2.5-coder:7b"
+    # model: "ollama:deepseek-r1:latest"
+    triggers:
+      - event: "pull_request.opened"
+      - event: "pull_request.synchronize"
+    actions:
+      - review_code
+      - post_review_comment
+
+# Validation Rules
+validation_rules:
+  prd:
+    required_sections:
+      connextra_context:
+        pattern: "As a .+, I want .+, so that .+"
+        description: "Must contain Connextra user story format"
+      gherkin_scenarios:
+        patterns:
+          - "Given .+"
+          - "When .+"
+          - "Then .+"
+        description: "Must contain at least one complete Gherkin scenario"
+    
+  feature:
+    required_fields:
+      related_prd:
+        pattern: "#\\d+"
+        description: "Must reference a PRD issue number"
+      description:
+        min_length: 50
+        description: "Must have substantial description"
+
+# Label Taxonomy
+labels:
+  types: 
+    - "prd"
+    - "feature"
+    - "enhancement"
+    - "bug"
+  
+  states:
+    - "refinement"
+    - "accepted"
+    - "scheduled"
+    - "needs-review"
+    - "in-progress"
+    - "done"
+  
+  questions:
+    - "product-question"
+    - "tech-question"
+  
+  sprints:
+    # Generated dynamically sprint-1 through sprint-52
+    prefix: "sprint-"
+    range: [1, 52]
