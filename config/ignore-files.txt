@@ -11,5 +11,8 @@ node_modules/
 ^README/i
 \.md$
 \.rst$
+\.txt$
 ^LICENSE/i
 ^CHANGELOG/i
+config/env
+\.yml$
