@@ -111,6 +111,24 @@ export class ConfigLoader {
     return config.agents[agentName] || null;
   }
 
+  public getReviewPromptTemplate(): string {
+    const agentContext = this.getAgent('pr-review')?.context;
+    if (agentContext) {
+        // 1. Found in the YAML config.
+        return agentContext;
+    }
+
+    const promptPath = path.resolve(process.cwd(), 'src/prompts/pr-review.md');
+    try {
+        // 2. Found in the external file (I/O operation).
+        return fs.readFileSync(promptPath, 'utf8');
+    } catch (e: any) {
+        console.warn(`[ConfigError] Using default prompt - Could not load context from ${promptPath}: ${e.message}`);
+        // 3. Hardcoded default fallback.
+        return `# PR Review Instructions\nFocus on the following areas:\n1. Security\n2. Bugs\n3. Performance\n\nReturn ONLY a JSON array.\n[FILE_CONTEXT]`;
+    }
+  }
+
   // --- MODEL VALIDATION SIMULATION (Conceptual, replace with API call if necessary) ---
   /**
    * Checks model availability. In a real app, this would use an API call 

@@ -8,14 +8,13 @@ import { PRFile, ReviewFinding, FilterStats, PostReviewContext } from './review-
 import * as path from 'path';
 import * as fs from 'fs';
 
-export class ReviewEngine { // FIX: Export is here
+export class ReviewEngine {
   private configLoader: ConfigLoader;
   private filterStats?: FilterStats;
 
-  // FIX: This constructor is simple and does NOT contain the .map() logic,
-  // preventing the TypeError when the main app calls `new ReviewEngine()`.
   constructor(private llm: LLMProvider) {
     this.configLoader = new ConfigLoader();
+    this.promptTemplate = this.configLoader.getAgentContext('pr-review');
   }
 
   async reviewPR(context: Context, pr: any, repo: any): Promise<void> {
@@ -52,8 +51,6 @@ export class ReviewEngine { // FIX: Export is here
           filterStats: this.filterStats
       };
       
-      // The ReviewEngineCore is instantiated *after* filesToReview has been filtered
-      // and is correctly passed the necessary arguments.
       const core = new ReviewEngineCore(coreContext, filesToReview);
       
       if (findings.length > 0) {
@@ -183,7 +180,7 @@ ${f.patch || 'No diff available'}
     try {
       return fs.readFileSync(promptPath, 'utf8');
     } catch (e: any) {
-      console.warn(`Could not load prompt template from ${promptPath}: ${e.message}`);
+      console.warn(`Using default prompt - Could not load context from ${promptPath}: ${e.message}`);
       return `# PR Review Instructions\nFocus on the following areas:\n1. Security\n2. Bugs\n3. Performance\n\nReturn ONLY a JSON array.\n[FILE_CONTEXT]`;
     }
   }

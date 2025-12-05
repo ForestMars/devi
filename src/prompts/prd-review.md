@@ -1,1 +1,0 @@
-# src/prompts/prd-review.md
