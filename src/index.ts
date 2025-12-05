@@ -4,7 +4,7 @@ import { Probot } from 'probot';
 import { ConfigLoader } from './config-loader';
 import { ReviewEngine } from './review-engine';
 
-const x = undefined y
+const x = undefined y;
 
 export default (app: Probot) => {
   // 1. Instantiate ConfigLoader once at the start
