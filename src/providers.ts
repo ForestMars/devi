@@ -37,10 +37,8 @@ export class OllamaProvider implements LLMProvider {
           // stop: ["\n]"] // CRITICAL FIX for Qwen truncation (stops output after closing JSON array)
           // stop: ["\n```", "```", "]"]
           stop: [
-            "\n```", // Stop when closing the code fence
-            "```",  // Stop when closing the code fence
-            "}]",   // Stop immediately after closing an object and closing the array (e.g., ...suggestion": "fix"}]} )
-            "]"     // Stop immediately after the final array brace
+            "```",  
+            "\n```"
           ]
         }
       })

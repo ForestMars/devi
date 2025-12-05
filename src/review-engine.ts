@@ -135,8 +135,23 @@ export class ReviewEngine {
       const totalBatches = Math.ceil(files.length / BATCH_SIZE);
       console.log(`\n📦 Reviewing batch ${batchNum}/${totalBatches} (${batch.length} files):`);
       batch.forEach(f => console.log(`   - ${f.filename}`));
+      // const prompt = this.buildReviewPrompt(pr, batch);
+      // console.log(`📏 Batch prompt: ${prompt.length} chars`);
+
+      // <<< CRITICAL DEBUG PRINT ADDED HERE >>>
+      if (batch[0] && batch[0].patch) {
+        console.log(`[DEBUG_RAW_PATCH] START for ${batch[0].filename}`);
+        console.log(batch[0].patch); 
+        console.log(`[DEBUG_RAW_PATCH] END`);
+      } else {
+        console.log(`[DEBUG_RAW_PATCH] WARNING: Patch content is NULL or EMPTY for ${batch[0].filename}`);
+      }
+      // <<< END DEBUG PRINT >>>
+      
       const prompt = this.buildReviewPrompt(pr, batch);
       console.log(`📏 Batch prompt: ${prompt.length} chars`);
+
+
       try {
         const response = await this.llm.generateReview(prompt); 
         
