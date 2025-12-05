@@ -1,4 +1,4 @@
-// src/review-engine.ts (Modified and Corrected Wrapper)
+// src/review-engine.ts
 
 import { Context } from 'probot';
 import { LLMProvider } from './providers';

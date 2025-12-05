@@ -62,7 +62,10 @@ export class ConfigLoader {
         console.log(`⚠️ Agent '${agentName}' using inline context from config`);
         continue;
       }
-      const promptPath = path.resolve(process.cwd(), `${this.configDirRoot}/prompts/${agentName}.md`);
+
+      console.log('👋👋👋 dir root is', this.configDirRoot );
+      const promptPath = path.join(this.configDirRoot, 'prompts', `${agentName}.md`);
+      console.log('👋👋👋 Prompt Path is', promptPath );
       if (fs.existsSync(promptPath)) {
         console.log(`✅ Agent '${agentName}' prompt file found: ${promptPath}`);
       } else {
@@ -124,21 +127,28 @@ export class ConfigLoader {
     return config.agents[agentName] || null;
   }
 
-  public getAgentContext(agentName): string {
+  public getAgentContext(agentName: string): string {
+    console.log(`[DEBUG:getAgentContext] Called for agent: ${agentName}`);
+    
     const agentContext = this.getAgent(agentName)?.context;
     if (agentContext) {
-        // 1. Found in the YAML config.
-        return agentContext;
+      console.log(`[DEBUG:getAgentContext] Using inline context from config`);
+      return agentContext;
     }
 
-    const promptPath = path.resolve(process.cwd(), `${this.configPath}/prompts/${agentName}.md`);
+    const promptPath = path.join(this.configDirRoot, 'prompts', `${agentName}.md`);
+    console.log(`[DEBUG:getAgentContext] Attempting to load from: ${promptPath}`);
+    console.log(`[DEBUG:getAgentContext] File exists: ${fs.existsSync(promptPath)}`);
+    
     try {
-        // 2. Found in the external file (I/O operation).
-        return fs.readFileSync(promptPath, 'utf8');
+      const content = fs.readFileSync(promptPath, 'utf8');
+      console.log(`[DEBUG:getAgentContext] Successfully loaded ${content.length} chars`);
+      return content;
     } catch (e: any) {
-        console.warn(`[ConfigError] Using default prompt - Could not load context from ${promptPath}: ${e.message}`);
-        // 3. Hardcoded default fallback.
-        return `# PR Review Instructions\nFocus on the following areas:\n1. Security\n2. Bugs\n3. Performance\n\nReturn ONLY a JSON array.\n[FILE_CONTEXT]`;
+      console.error(`[DEBUG:getAgentContext] FAILED to load: ${e.message}`);
+      console.error(`[DEBUG:getAgentContext] Error code: ${e.code}`);
+      console.warn(`[ConfigError] Using default prompt - Could not load context from ${promptPath}: ${e.message}`);
+      return `# PR Review Instructions\nFocus on the following areas:\n1. Security\n2. Bugs\n3. Performance\n\nReturn ONLY a JSON array.\n[FILE_CONTEXT]`;
     }
   }
 
