@@ -42,24 +42,37 @@ export interface Trigger {
 
 export class ConfigLoader {
   private config: AgentConfig | null = null;
-  
-  // New private property to hold the config directory root
   private configDirRoot: string;
-
-  // The main config file is now assumed to be inside the config directory
+  private configPath: string; 
   private configFile: string = 'agent-workflow.yml';
-
-  constructor(baseDir: string = 'config') {
+  
+  constructor(private baseDir: string = 'config') {
     this.configDirRoot = path.resolve(process.cwd(), baseDir);
     this.configPath = path.join(this.configDirRoot, this.configFile);
     this.loadEnvironmentVariables();
+    this.verifyPromptFiles();
+  }
 
-    // this.configPath = path.resolve(process.cwd(), 'config');
-    // this.loadEnvironmentVariables();
-    // const __filename = url.fileURLToPath(import.meta.url);
-    // const __dirname = path.dirname(__filename);
-    // Go up ONE level: src/ -> pedal/
-    // this.configPath = path.join(__dirname, '..', this.configPath);
+  private verifyPromptFiles(): void {
+    const config = this.load();
+    const missingPrompts: string[] = [];
+    
+    for (const [agentName, agent] of Object.entries(config.agents)) {
+      if (agent.context) {
+        console.log(`⚠️ Agent '${agentName}' using inline context from config`);
+        continue;
+      }
+      const promptPath = path.resolve(process.cwd(), `${this.configDirRoot}/prompts/${agentName}.md`);
+      if (fs.existsSync(promptPath)) {
+        console.log(`✅ Agent '${agentName}' prompt file found: ${promptPath}`);
+      } else {
+        console.warn(`⚠️  Agent '${agentName}' prompt file missing: ${promptPath}`);
+        missingPrompts.push(agentName);
+      }
+    }
+    if (missingPrompts.length > 0) {
+      console.warn(`⚠️  ${missingPrompts.length} agent(s) missing prompt files. Will use fallback prompts.`);
+    }
   }
 
   private loadEnvironmentVariables(): void {
@@ -111,14 +124,14 @@ export class ConfigLoader {
     return config.agents[agentName] || null;
   }
 
-  public getReviewPromptTemplate(): string {
-    const agentContext = this.getAgent('pr-review')?.context;
+  public getAgentContext(agentName): string {
+    const agentContext = this.getAgent(agentName)?.context;
     if (agentContext) {
         // 1. Found in the YAML config.
         return agentContext;
     }
 
-    const promptPath = path.resolve(process.cwd(), 'src/prompts/pr-review.md');
+    const promptPath = path.resolve(process.cwd(), `${this.configPath}/prompts/${agentName}.md`);
     try {
         // 2. Found in the external file (I/O operation).
         return fs.readFileSync(promptPath, 'utf8');
