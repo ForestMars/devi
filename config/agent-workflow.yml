@@ -90,7 +90,7 @@ agents:
     model: "ollama:qwen-coder:pedal"
     # model: "ollama:qwen2.5-coder:7b"
     # model: "ollama:deepseek-r1:latest"
-    max_output_tokens: 4000
+    max_output_tokens: 4096
     triggers:
       - event: "pull_request.opened"
       - event: "pull_request.synchronize"
