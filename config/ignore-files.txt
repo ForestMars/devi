@@ -2,7 +2,7 @@
 \.lock$
 package-lock\.json$
 yarn\.lock$
-bun\.lockb$
+bun\.lock$
 \.min\.(js|css)$
 \.map$
 dist/
