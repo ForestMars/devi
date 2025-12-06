@@ -1,8 +1,8 @@
 // src/review-engine.ts
 
 import { Context } from 'probot';
-import { LLMProvider } from './providers';
-import { ConfigLoader } from './config-loader';
+import { LLMProvider } from '../providers';
+import { ConfigLoader } from '../config/config-loader';
 import { ReviewEngineCore } from './review-engine-core';
 import { PRFile, ReviewFinding, FilterStats, PostReviewContext } from './review-engine-types';
 import * as path from 'path';
