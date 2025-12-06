@@ -1,1 +1,1 @@
-# src/prompts/prd-review.md
+# src/prompts/auto-fix-pr.md

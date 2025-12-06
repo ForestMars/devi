@@ -1,77 +1,86 @@
 // src/index.ts
 
 import { Probot } from 'probot';
-import { ConfigLoader } from './config-loader';
-import { ReviewEngine } from './review-engine';
+import { ConfigLoader } from './config/config-loader';
+import { ReviewEngine } from './agents/review-engine';
+
+// --- Global Startup Logic (Executes Once) ---
+
+const CONFIG_PATH = process.env.CONFIG_PATH;
+
+if (!CONFIG_PATH) {
+    console.error("🔴 Fatal Error: CONFIG_PATH environment variable is not set. Cannot start.");
+    process.exit(1); 
+}
+
+let configLoader: ConfigLoader;
+
+try {
+  console.log(`📂 Loading config from: ${CONFIG_PATH}`);
+  configLoader = new ConfigLoader(CONFIG_PATH);
+  
+  const config = configLoader.config;
+  
+  const logProvider = config.llm.default_provider;
+  const logModel = config.llm.default_model;
+  
+  console.log(`🤖 PR Review Agent initialized. Configured Model: **${logProvider} (${logModel})**`);
+  console.log(`✅ ConfigLoader successfully initialized`);
+  
+} catch (e: any) {
+  console.error(`🔴 Fatal Error: Could not load configuration: ${e.message}`);
+  console.error(e.stack);
+  process.exit(1);
+}
+
+// --- Probot Application Handler (Executes on Events) ---
 
 export default (app: Probot) => {
-  // 1. Instantiate ConfigLoader once at the start
-  const configLoader = new ConfigLoader();
-
-  try {
-    const config = configLoader.load(); // Load config synchronously at startup
+    console.log(`🎯 Probot app handler registered`);
+    console.log(`🔔 Listening for: pull_request.opened, pull_request.reopened, pull_request.synchronize`);
     
-    // Get the model name the agent will use from the configuration
-    const agentConfig = config.agents['pr-review'];
+    app.on(["pull_request.opened", "pull_request.reopened", "pull_request.synchronize"], async (context) => {
+        console.log(`\n🚨 WEBHOOK RECEIVED - Event handler triggered!`);
+        
+        const pr = context.payload.pull_request;
+        const repo = context.payload.repository;
+
+        console.log("\n========================================");
+        console.log(`📝 PR Event: ${context.payload.action}`);
+        console.log(`Repository: ${repo.owner.login}/${repo.name}`);
+        console.log(`PR #${pr.number}: ${pr.title}`);
+        console.log("========================================\n");
+
+        try {
+            console.log(`🔧 Getting LLM provider...`);
+            const llmProvider = configLoader.getLLMProvider(); 
+            console.log(`✅ LLM provider created: ${llmProvider.constructor.name}`);
+            
+            llmProvider.maxOutputTokens = 9999;
+            
+            console.log(`🔧 Creating ReviewEngine...`);
+            const reviewEngine = new ReviewEngine(llmProvider, configLoader); 
+            console.log(`✅ ReviewEngine created`);
+            
+            console.log(`🚀 Starting PR review...`);
+            await reviewEngine.reviewPR(context, pr, repo);
+            console.log(`✅ PR review completed`);
+            
+        } catch (error: any) {
+            console.error("❌ Error reviewing PR (See full trace below):", error.message);
+            console.error(error.stack); 
+
+            await context.octokit.issues.createComment({
+                owner: repo.owner.login,
+                repo: repo.name,
+                issue_number: pr.number,
+                body: `🤖 **AI Code Review Error**\n\n⚠️ Failed to review PR: **${error.message.substring(0, 500)}**\n\nI encountered an internal error. Please check the application logs for details.`
+            });
+        }
+    });
     
-    let modelToLog: string;
-    let providerToLog: string;
-
-    if (agentConfig && agentConfig.model.includes(':')) {
-      // If model is defined as 'provider:model'
-      const parts = agentConfig.model.split(':');
-      providerToLog = parts[0];
-      modelToLog = parts.slice(1).join(':'); // Handle model names with colons
-    } else {
-      // Use the defaults if not explicitly set with provider prefix
-      providerToLog = config.llm.default_provider;
-      modelToLog = agentConfig?.model || config.llm.default_model;
-    }
-    
-    // Display the successfully loaded configuration model name
-    console.log(`🤖 PR Review Agent initialized. Configured Model: **${providerToLog} (${modelToLog})**`);
-    
-  } catch (e: any) {
-    console.error(`🔴 Fatal Error: Could not load configuration: ${e.message}`);
-    // If config fails to load, the app is non-functional, so we return early.
-    return;
-  }
-  
-  // --- The app.on handler: Where the work happens ---
-  app.on(["pull_request.opened", "pull_request.reopened", "pull_request.synchronize"], async (context) => {
-    const pr = context.payload.pull_request;
-    const repo = context.payload.repository;
-
-    console.log("\n========================================");
-    console.log(`📝 PR Event: ${context.payload.action}`);
-    console.log(`Repository: ${repo.owner.login}/${repo.name}`);
-    console.log(`PR #${pr.number}: ${pr.title}`);
-    console.log(`Author: ${pr.user.login}`);
-    console.log("========================================\n");
-
-    try {
-      // 2. Create LLM Provider
-      const llmProvider = configLoader.createProvider('pr-review');
-      llmProvider.maxOutputTokens = 9999;
-      
-      // 3. FIX: Instantiate ReviewEngine, passing the ConfigLoader instance.
-      // NOTE: ReviewEngine constructor must now accept (llmProvider, configLoader)
-      const reviewEngine = new ReviewEngine(llmProvider, configLoader); 
-      
-      await reviewEngine.reviewPR(context, pr, repo);
-      
-    } catch (error: any) {
-      // 4. CRITICAL: Comprehensive error handling to stop silent failure
-      console.error("❌ Error reviewing PR (See full trace below):", error.message);
-      console.error(error); // Log the full stack trace
-
-      // Post failure comment to the PR
-      await context.octokit.issues.createComment({
-        owner: repo.owner.login,
-        repo: repo.name,
-        issue_number: pr.number,
-        body: `🤖 **AI Code Review Error**\n\n⚠️ Failed to review PR: **${error.message.substring(0, 500)}**\n\nI encountered an internal error. Please check the application logs for details.`
-      });
-    }
-  });
+    // Add a catch-all to see if webhook is even reaching the app
+    app.onAny(async (context) => {
+        console.log(`📨 Received webhook: ${context.name}.${context.payload.action || 'no-action'}`);
+    });
 };

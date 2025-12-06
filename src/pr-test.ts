@@ -2,7 +2,7 @@
 // Run this to test the improved prompt on a specific PR
 
 import { Octokit } from "@octokit/rest";
-import { ReviewEngine } from "../src/review-engine";
+import { ReviewEngine } from "./agents/review-engine";
 import { OllamaProvider } from "../src/providers";
 
 async function testReview() {

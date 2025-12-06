@@ -1,115 +1,126 @@
-.. image:: https://img.shields.io/badge/Setup-Complete-brightgreen
-   :alt: Setup Status
+pedal-dev
+=========
 
-******
-Setup
-******
+.. image:: ./assets/multipass.png
+   :alt: Multipass
 
-This document outlines the steps required to set up the project both locally and for integration with GitHub.
-This project, `ForestMars/pedal-dev`, operates as a PR review agent powered by Ollama.
+**Now with MULTIPASS!**
 
+A GitHub App for product engineering design automation lifecycle. 
 
+Companion app to `pedal-pro <https://github.com/ForestMars/PEDAL>`_, the automated pipeline. Provides automated code review using LLM providers, reviewing pull requests and posting inline comments with actionable feedback.
 
----
+Agents
+------
 
-.. _local-setup:
+pedal-dev provisions 6 automation agents across the product engineering lifecycle:
 
-Local Setup
-===========
+1. **prd-agent** - Reviews product requirements documents
+2. **refinement** - Reviews product requests (GitHub tickets), accepts into sprint or returns with questions
+3. **pr-review** - Automated code review on pull requests (first working implementation, currently A/B testing prompts)
+4. **auto-fix-pr** - Responds to issues identified by pr-review agent
+5. *[TBD]*
+6. *[TBD]*
 
-Follow these steps to configure your local environment and receive webhooks via **smee**.
+Features
+--------
 
-1.  **Install Bun:**
-    .. code-block:: bash
+- Multi-pass review with configurable merge strategies
+- Batch processing for large changesets
+- Configurable file filtering and ignore patterns
+- Support for multiple LLM providers
+- Inline code comments on specific lines
+- Summary comments when no issues found
 
-        curl -fsSL https://bun.sh/install | bash
+Configuration
+-------------
 
-2.  **Install Ollama:**
-    .. code-block:: bash
+Environment Variables
+~~~~~~~~~~~~~~~~~~~~~
 
-        curl -fsSL https://ollama.com/install.sh | sh
+.. code-block:: bash
 
-3.  **Pull a model (e.g., Code Llama):**
-    .. code-block:: bash
+   # LLM Provider
+   LLM_PROVIDER=anthropic           # anthropic, openai, etc.
+   ANTHROPIC_API_KEY=sk-ant-...
+   MODEL_NAME=claude-sonnet-4-20250514
 
-        ollama pull codellama
+   # File Filtering
+   FILTER_LARGE_FILES=yes           # Enable strict filtering
+   MAX_FILE_CHANGES=800             # Skip files exceeding this threshold
+   MAX_FILES=15                     # Review at most this many files
 
-4.  **Project Setup:**
-    * Clone or create your project directory.
-    * Run the project dependencies installation:
-        .. code-block:: bash
+   # Multi-pass Review (optional)
+   PR_REVIEW_MULTIPASS=true         # Enable multi-pass mode
+   PR_REVIEW_PASSES=3               # Number of passes (default: 1)
+   PR_REVIEW_MERGE_STRATEGY=union   # union|intersection|majority
 
-            bun install
+Ignore Patterns
+~~~~~~~~~~~~~~~
 
-5.  **Environment File:**
-    * Create a ``.env`` file in the root directory. (Refer to project documentation for contents.)
+Configure ignored files in ``config/ignore-files.txt``::
 
-6.  **Setup Smee.io for Local Tunneling**
-    To receive webhooks (like those from Render.com or GitHub) on your local machine, you must use a tunneling service.
+   \.gitignore$
+   \.lock$
+   package-lock\.json$
+   \.min\.(js|css)$
+   \.map$
+   dist/
+   node_modules/
+   \.md$
+   \.yml$
 
-    * **Install Smee Client:**
-        .. code-block:: bash
+Patterns are treated as regular expressions.
 
-            npm install --global smee-client
+Review Prompt
+~~~~~~~~~~~~~
 
-    * **Get a Smee Channel URL:**
-        Go to **https://smee.io/** and click **"Start a new channel"** to get a unique URL (e.g., ``https://smee.io/aBcDeF12345``).
+Customize the review prompt in ``config/prompts/pr-review.md`` or via the agent configuration system.
 
-    * **Run Smee Client:**
-        Forward the webhook payloads from the Smee URL to your local server (running on port 3000):
-        .. code-block:: bash
+Multi-pass Review
+-----------------
 
-            smee -u YOUR_SMEE_URL -t http://localhost:3000/api/webhook/github
+Multi-pass mode runs the review multiple times and merges findings based on the configured strategy:
 
-        .. important::
-            * Replace ``YOUR_SMEE_URL`` with the unique URL you obtained from smee.io.
-            * **Crucially:** You must configure the webhook URL in **GitHub** (via your Render.com settings) to use this **Smee URL** instead of your local IP address.
+- **union**: All findings from all passes (deduplicated)
+- **intersection**: Only findings present in every pass
+- **majority**: Findings present in >50% of passes
 
----
+This reduces false positives and increases confidence in reported issues.
 
-.. _github-setup:
+Installation
+------------
 
-GitHub Setup
-============
+1. Clone the repository
+2. Install dependencies: ``npm install`` or ``bun install``
+3. Configure environment variables
+4. Set up GitHub App credentials
+5. Deploy and configure webhook
 
-This section covers the necessary configurations for GitHub integration.
+Development
+-----------
 
-Personal Access Token
----------------------
+.. code-block:: bash
 
-The Personal Access Token (PAT) is required for API access.
+   # Install dependencies
+   bun install
 
-1.  Go to **GitHub** → **Settings** → **Developer settings** → **Personal access tokens** → **Tokens (classic)**.
-2.  Click **Generate new token**.
-3.  Select the following scopes:
-    * ``repo`` (all)
-    * ``write:discussion``
-4.  **Copy the token** and paste it into the project's ``.auth`` file as ``GITHUB_TOKEN``.
+   # Run locally
+   bun run start
 
-Generate Webhook Secret
------------------------
+   # Build
+   bun run build
 
-A Webhook Secret is used to secure the payload sent from GitHub.
+Architecture
+------------
 
-1.  Generate a 32-character hexadecimal secret using the following command:
-    .. code-block:: bash
+- **ReviewEngine**: Orchestrates the review process
+- **ReviewEngineCore**: Handles comment posting and formatting
+- **LLMProvider**: Abstract interface for LLM interactions
+- **ConfigLoader**: Manages configuration and ignore patterns
 
-        openssl rand -hex 32
+License
+-------
 
-2.  **Copy the output** and paste it into your ``.env`` file as ``GITHUB_WEBHOOK_SECRET``.
-
----
-
-.. _testing:
-
-Testing
-=======
-
-Use these ``curl`` commands to test the local server endpoints after starting the application and completing all setup steps.
-
-Test Webhook Endpoint
----------------------
-
-This command simulates a **Pull Request Opened** event being sent to your local webhook listener:
-
-.. code-block
+All Rights Reserved
+Contact for Licensing

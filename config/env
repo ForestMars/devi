@@ -7,4 +7,13 @@ FILTER_LARGE_FILES=yes
 ## pr-reiview
 PR_REVIEW_MODEL=qwen-coder:pedal
 
+# Prompts
+## Path to prompt file for each agent (relative to project root)
+# PR_REVIEW_PROMPT=config/prompts/pr-review.md
+PR_REVIEW_PROMPT=config/prompts/pr-agent.md
 
+# Review Strategy
+PR_REVIEW_MULTIPASS=false
+PR_REVIEW_PASSES=3  # Number of passes if multipass enabled
+PR_REVIEW_TEMPERATURE=0.3
+PR_REVIEW_MERGE_STRATEGY=union  # union (all findings) | intersection (only if found multiple times) | majority (found in >50% of passes)

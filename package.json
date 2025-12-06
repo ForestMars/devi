@@ -3,10 +3,11 @@
   "version": "0.0.1",
   "type": "module",
   "scripts": {
-    "dev": "tsx node_modules/.bin/probot run ./src/index.ts",
-    "start": "tsx node_modules/.bin/probot run ./src/index.ts",
-    "smee": "smee --url https://smee.io/soupchannel --target http://localhost:3000/",
-    "build": "tsc"
+    "build": "bun run build:barrels && tsc",
+    "build:barrels": "barrelsby --directory ./src/providers --delete --singleQuotes --location all",
+    "start": "bun run build:barrels && tsx node_modules/.bin/probot run ./src/index.ts",
+    "dev": "bun run build:barrels && CONFIG_PATH='./config/agent-workflow.yml' dotenv -e config/env -- bun --watch tsx node_modules/.bin/probot run ./src/index.ts",
+    "smee": "smee --url https://smee.io/soupchannel --target http://localhost:3000/"
   },
   "dependencies": {
     "probot": "^13.3.0",
@@ -14,6 +15,8 @@
   },
   "devDependencies": {
     "@types/node": "^20.10.0",
+    "barrelsby": "^2.8.1",
+    "dotenv-cli": "^11.0.0",
     "smee-client": "^2.0.1",
     "tsx": "^4.21.0",
     "typescript": "^5.3.3"
