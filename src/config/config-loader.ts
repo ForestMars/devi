@@ -135,8 +135,17 @@ export class ConfigLoader {
     }
 
     public getPromptFilePath(agentName: string): string {
+        const envVarName = `${agentName.toUpperCase().replace('-', '_')}_PROMPT`;
+        const envPath = process.env[envVarName];
+    
+        if (envPath) {
+            return path.join(process.cwd(), envPath);
+        }
+    
+        // Fall back to default location
+        console.log(`Prompt not loaded from ENV, falling back to default prompt`) // Should be WARN? 
         return path.join(process.cwd(), 'config', 'prompts', `${agentName}.md`);
-    }
+}
 
     public getIgnorePatterns(): RegExp[] {
     const filePath = path.join(process.cwd(), 'config', 'ignore-files.txt');
