@@ -1,5 +1,19 @@
 #!/usr/bin/env bun
-
+/**
+ * @file smart-fix.ts
+ * @description Analyzes TypeScript build errors, intelligently groups similar errors,
+ * and generates consolidated, systemic fix suggestions using an Ollama LLM.
+ *
+ * @author Me, with Sonnet (4.5) helping
+ * @version 0.0.2
+ * @license Unlicensed 
+ *
+ * @usage
+ *
+ * @dependencies
+ * - Bun Runtime Environment
+ * - Ollama (running locally or accessible via --host)
+ */
 import { readFileSync, existsSync } from "fs";
 import { join } from "path";
 
@@ -29,9 +43,10 @@ function showHelp() {
 fix-suggestion.ts — Generate LLM suggestions for TypeScript build errors
 
 USAGE:
-  bun fix-suggestion.ts [--model <name>] [--errors <path>] [--prompt <path>] [--help]
+  bun smart-fix.ts [--model <name>] [--errors <path>] [--prompt <path>] [--help]
 
 OPTIONS:
+  --count <num>      Limit number of attempted fixes
   --model <name>     Select the Ollama model (default: qwen-coder:latest)
   --errors <path>    Path to build errors file (default: ./build-errors.txt)
   --prompt <path>    Path to prompt template (default: ./prompts/fix-suggestion.prompt.txt)
