@@ -1,0 +1,250 @@
+name: Pedal CI
+
+env:
+  APP_ENV: CI
+  IS_CI: true
+  CI: true # Vitest allowOnly = false
+  NODE_ENV: 'test'
+  ROLLBAR_ENV: 'GitHubCI'
+  TEST_WITHOUT_LOGS: 'true'
+  PRIVATE_KEY: '0x83c65f24efbc8f4bc54ad425e897fc3ea01f760d5e71671a30eacb075ebe2313'
+  PORT: 8080
+  REDIS_URL: redis://localhost:6379
+  GITHUB_BASE_REF: ${{ github.base_ref }}
+  
+
+on:
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: "PR number to test (optional)"
+        required: false
+        type: number
+  pull_request:
+  push:
+    branches:
+      - master
+
+jobs:
+  start-prod-server:
+    name: Test Production Server
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    services:
+      redis:
+        image: redis:latest
+        ports:
+          - 6379:6379
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.pr_number && format('refs/pull/{0}/head', github.event.inputs.pr_number) || github.ref }}
+      
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Build server
+        run: bun run --filter pedal build 
+
+      - name: Run serial e2e tests
+        run: |
+          (cd packages/pedal && SERVICE=web bun run --bun ./build/server.js) &
+          (bun run --filter pedal wait-server && bun run --filter pedal test-e2e-serial --forbid-only)
+      
+      - name: Archive code coverage results
+        uses: actions/upload-artifact@v4
+        with:
+          name: code-coverage-report
+          path: coverage
+
+  # Build and Typecheck
+  pedal-build-type-checks:
+    name: Build & Type Checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.inputs.pr_number && format('refs/pull/{0}/head', github.event.inputs.pr_number) || github.ref }}
+      
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Assert bun.lock is correct
+        run: |
+          if ! git diff --quiet; then
+            echo 'You need to update the bun.lock file'
+            exit 1
+          fi
+
+      - name: build
+        run: bun run --recursive build
+
+      - name: check-types
+        run: bun run --recursive check-types
+
+
+  # Lint Diff
+  pedal-lint-diff:
+    name: Lint
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.inputs.pr_number && format('refs/pull/{0}/head', github.event.inputs.pr_number) || github.ref }}
+      
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Lint Diff Files
+        env:
+          ESLINT_PLUGIN_DIFF_COMMIT: "origin/${{ github.base_ref }}"
+        run: bun run lint-diff
+
+      - name: Run eslint-diff-canary to make sure eslint-diff is functioning properly
+        run: bun run --filter pedal lint-diff-canary
+
+
+  detect-broken-ts-expect-error:
+    name: Detect Broken TS expect errors
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.inputs.pr_number && format('refs/pull/{0}/head', github.event.inputs.pr_number) || github.ref }}
+      
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Assert bun.lock is correct
+        run: |
+          if ! git diff --quiet; then
+            echo 'You need to update the bun.lock file'
+            exit 1
+          fi
+
+      - name: build
+        run: bun run --recursive build
+
+      - name: run detect-broken-ts-expect-error.sh
+        run: cd packages/pedal && ./scripts/detect-broken-ts-expect-error.sh
+
+  # These tests run quickly, so run them in a separate job
+  pedal-integration-test:
+    name: Pedal Integration Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    services:
+      redis:
+        image: redis:latest
+        ports:
+          - 6379:6379
+      rabbitmq:
+        image: rabbitmq:3.11-management
+        ports:
+          - 5672:5672
+          - 15672:15672
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.pr_number && format('refs/pull/{0}/head', github.event.inputs.pr_number) || github.ref }}
+      
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Build
+        run: bun run --recursive build
+
+      - name: Run integration tests
+        run: bun run --filter pedal test-integration --allowOnly=false 
+
+  pedal-unit-tests:
+    name: Pedal Unit Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    services:
+      redis:
+        image: redis:latest
+        ports:
+          - 6379:6379
+      rabbitmq:
+        image: rabbitmq:3.11-management
+        ports:
+          - 5672:5672
+          - 15672:15672
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.pr_number && format('refs/pull/{0}/head', github.event.inputs.pr_number) || github.ref }}
+      
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Run unit tests
+        run: bun run --recursive test -- --allowOnly=false
+
+      - name: Change permissions of coverage files
+        run: |
+          chmod -R 755 ./libs/adapters/coverage/lcov.info
+          chmod -R 755 ./libs/model/coverage/lcov.info
+          chmod -R 755 ./libs/sitemaps/coverage/lcov.info
+
+      - name: Coveralls parallel
+        uses: coverallsapp/github-action@v2
+        with:
+          flag-name: unit-test-coverage
+          parallel: true
+          files: libs/adapters/coverage/lcov.info libs/model/coverage/lcov.info libs/sitemaps/coverage/lcov.info
+
+  report-coverage:
+    name: Upload Test Coverage Report
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    needs: [ pedal-unit-tests ]
+    if: always()
+
+    steps:
+      - name: Coveralls Finished
+        uses: coverallsapp/github-action@v2
+        with:
+          parallel-finished: true
