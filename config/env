@@ -5,7 +5,7 @@ FILTER_LARGE_FILES=yes
 
 # Models 
 ## pr-reiview
-PR_REVIEW_MODEL=qwen-coder:pedal
+PR_REVIEW_MODEL=qwen2.5-coder:7b
 
 # Prompts
 ## Path to prompt file for each agent (relative to project root)

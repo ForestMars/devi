@@ -1,0 +1,11 @@
+TS2835 Missing file extension in import - Add .js extensions to 15 import statements across 7 files
+
+TS7006 Implicit any type - Add type annotations to 6 parameters with implicit 'any'
+
+TS2304 Cannot find name - Add missing import for 'LLMProvider' to 4 files
+
+TS2307 Cannot find module - Install missing dependency '@octokit/rest'
+
+TS2834 Missing file extension in import - Add .js extensions to 2 import statements across 2 files
+
+TS7016 Missing type declarations - Install type declarations for 'js-yaml'. '/Users/forestmars/sandbox/pedal/node_modules/js-yaml/dist/js-yaml.mjs' implicitly has an 'any'

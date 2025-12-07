@@ -17,6 +17,7 @@ export class ReviewEngine {
 
   constructor(private llm: LLMProvider, configLoader: ConfigLoader) {
     this.configLoader = configLoader;
+    console.log(`🤖 ReviewEngine using: ${this.llm.name} - ${this.llm.getModelName()}`);  // ADD THIS
     this.promptTemplate = this.configLoader.getAgentContext(agent);
   }
 

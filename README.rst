@@ -106,7 +106,7 @@ Development
    bun install
 
    # Run locally
-   bun run start
+   bun run dev
 
    # Build
    bun run build
