@@ -1,12 +1,11 @@
 #!/usr/bin/env bun
-
 /**
  * @file ts-fix-agent.ts
  * @description Analyzes TypeScript build errors, intelligently groups similar errors,
  * and generates consolidated, systemic fix suggestions using an Ollama LLM.
  *
- * @author Me and supermodels 
- * @version 0.0.4
+ * @author Me and some supermodels
+ * @version 0.0.5
  * @license MIT
  *
  * @usage
@@ -21,12 +20,12 @@
 import { readFileSync, existsSync } from "fs";
 import { join } from "path";
 
+// Configuration
 let DEFAULT_MODEL = "codellama:latest";
-let DEFAULT_PROVIDER = "http://localhost:11434";
+let DEFAULT_OLLAMA_HOST = "http://localhost:11434";
 let DEFAULT_ERRORS_PATH = join(process.cwd(), "build-errors.txt");
 let DEFAULT_OUTPUT_FILE = join(process.cwd(), "fix-suggestions");
 let DEFAULT_MAX_GROUPS = Infinity; // Represents processing all groups by default
-
 
 // Types
 interface TSError {
@@ -54,19 +53,6 @@ interface Config {
   outputPath: string;
   useStreaming: boolean;
 }
-
-// Resolve MAX_GROUPS
-let MAX_GROUPS = DEFAULT_MAX_GROUPS; // Use the hoisted default first
-const countArgIndex = args.indexOf("--count") !== -1 ? args.indexOf("--count") : args.indexOf("-n");
-
-if (countArgIndex !== -1 && args[countArgIndex + 1] && !isNaN(parseInt(args[countArgIndex + 1]))) {
-    MAX_GROUPS = parseInt(args[countArgIndex + 1]); // Override default with parsed argument
-}
-
-// Configuration
-const DEFAULT_OLLAMA_HOST = 'http://localhost:11434';
-const DEFAULT_MODEL = 'codellama:latest';
-const DEFAULT_PROMPT_PATH = join(process.cwd(), 'prompts/fix-suggestion.prompt.txt');
 
 // CLI Help
 function showHelp() {
@@ -138,7 +124,9 @@ function parseArgs(): Config {
   };
 }
 
-// Error Parsing
+/*
+ * Parse Build Errors
+ */
 function parseTypeScriptErrors(output: string): TSError[] {
   const errors: TSError[] = [];
   const lines = output.split('\n');
@@ -232,7 +220,7 @@ async function generateGroupFix(
       .replace(/\{\{ERROR_COUNT\}\}/g, group.count.toString())
       .replace(/\{\{EXAMPLE_ERRORS\}\}/g, exampleErrors);
   } else {
-    prompt = `Immediate return the message: "Context not found. Nothing to do."`;
+    prompt = `Immediate return this: "Context not found. Nothing to do."`;
   }
 
   try {
@@ -248,7 +236,7 @@ async function generateGroupFix(
           num_predict: 600
         }
       }),
-      signal: AbortSignal.timeout(120000) // 120 second timeout
+      signal: AbortSignal.timeout(120000)
     });
 
     if (!response.ok) {
@@ -372,7 +360,7 @@ async function main() {
     console.log(`   ✅ Done\n`);
   }
 
-  // I can haz results? 
+  // I can haz results?
   console.log('━'.repeat(60));
   console.log('\n📋 CONSOLIDATED FIXES:\n');
   console.log('━'.repeat(60) + '\n');
@@ -396,7 +384,7 @@ async function main() {
     }
     console.log('\n' + '─'.repeat(60));
     
-    // Add to markdown // FIXME: We said the user could select text, markdon or json. md ok for default. 
+    // FIXE: WE SAID USER COULD SELECT txt, md or json (md ok for default)
     markdown += `## ${i + 1}. [${group.code}] ${group.pattern} (${group.count} occurrences)\n\n`;
     markdown += `### Fix Suggestion\n\n${fix}\n\n`;
     markdown += `### Affected Files\n`;
