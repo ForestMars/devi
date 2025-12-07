@@ -1,11 +1,46 @@
-TS2835 Missing file extension in import - Add .js extensions to 15 import statements across 7 files
+TS2835 Missing file extension in import
+  - 15 occurrences across 7 files
+  - Add .js extensions to 15 import statements across 7 files
+  - Files:
+    src/agents/review-engine-core.ts (line 4)
+    src/agents/review-engine.ts (lines 5,6,7)
+    src/config/config-loader.ts (line 10)
+    src/index.ts (lines 4,5)
+    src/pr-test.ts (line 5)
+    src/providers/index.ts (lines 5,6,7,9,10,11)
+    src/providers/ollama-provider.ts (line 3)
 
-TS7006 Implicit any type - Add type annotations to 6 parameters with implicit 'any'
+TS7006 Implicit any type
+  - 6 occurrences across 6 files
+  - Add type annotations to 6 parameters with implicit 'any'
+  - Files:
+    src/agents/review-engine.ts (line 102)
+    src/pr-test.ts (line 60)
+    src/pr-test.ts (line 131)
+    src/pr-test.ts (line 131)
+    src/pr-test.ts (line 141)
+    src/pr-test.ts (line 142)
 
-TS2304 Cannot find name - Add missing import for 'LLMProvider' to 4 files
+TS2304 Cannot find name
+  - 4 occurrences across 4 files
+  - Add missing import for 'LLMProvider' to 4 files
+  - Files:
+    src/providers/claude-provider.ts (line 1)
+    src/providers/gemini-provider.ts (line 1)
+    src/providers/openai-provider.ts (line 1)
+    src/providers/openrouter-provider.ts (line 1)
 
-TS2307 Cannot find module - Install missing dependency '@octokit/rest'
+TS2307 Cannot find module
+  - 3 occurrences across 0 file
+  - Install missing dependency '@octokit/rest'
 
-TS2834 Missing file extension in import - Add .js extensions to 2 import statements across 2 files
+TS2834 Missing file extension in import
+  - 2 occurrences across 2 files
+  - Add .js extensions to 2 import statements across 2 files
+  - Files:
+    src/agents/review-engine.ts (line 4)
+    src/pr-test.ts (line 6)
 
-TS7016 Missing type declarations - Install type declarations for 'js-yaml'. '/Users/forestmars/sandbox/pedal/node_modules/js-yaml/dist/js-yaml.mjs' implicitly has an 'any'
+TS7016 Missing type declarations
+  - 1 occurrence across 0 file
+  - Install type declarations for 'js-yaml'. '/Users/forestmars/sandbox/pedal/node_modules/js-yaml/dist/js-yaml.mjs' implicitly has an 'any'
