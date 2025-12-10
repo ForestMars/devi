@@ -1,3 +1,7 @@
+##
+# /config/env
+##
+
 # Controls whether ReviewEngine should aggressively filter out files 
 # with high change counts (to manage LLM token limits).
 # Set to 'yes' to enable strict filtering.
@@ -19,5 +23,6 @@ PR_REVIEW_TEMPERATURE=0.3
 PR_REVIEW_MERGE_STRATEGY=union  # union (all findings) | intersection (only if found multiple times) | majority (found in >50% of passes)
 
 export ENGINE=analyser
+export OLLAMA_MODEL=qwen2.3-coder:32b
 export AIDER_MODEL=ollama/qwen2.5-coder:7b
 
