@@ -1,5 +1,5 @@
 // src/review-engine.ts - CLEANED UP VERSION
-// version bump
+// new version bump
 import { Context } from 'probot';
 import { LLMProvider } from '../providers';
 import { ConfigLoader } from '../config/config-loader';
