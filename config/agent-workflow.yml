@@ -1,4 +1,4 @@
-# .github/agent-workflow.yml
+# config/agent-workflow.yml
 version: "1.0"
 
 # Global settings
@@ -9,7 +9,7 @@ settings:
 # LLM Provider Configuration
 llm:
   default_provider: "ollama"
-  default_model: "qwen2.5-coder:7b"
+  default_model: "qwen3-coder:latest"
   
   providers:
     ollama:
@@ -21,6 +21,8 @@ llm:
         - "qwen-coder:pedal"
         - "deepseek-r1:latest"
         - "codellama"
+        - "deepseek-coder-v2:16b"
+        - "qwen3-coder:latest"
     
     anthropic:
       api_key_env: "ANTHROPIC_API_KEY"
@@ -88,8 +90,9 @@ agents:
   # Reviews code in PRs
   pr-review:
     # model: "ollama:qwen-coder:pedal"
-    model: "ollama:qwen2.5-coder:7b"
+    # model: "ollama:qwen2.5-coder:7b"
     # model: "ollama:deepseek-r1:latest"
+    model: "deepseek-coder-v2:16b"
     max_output_tokens: 4096
     triggers:
       - event: "pull_request.opened"

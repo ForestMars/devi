@@ -9,4 +9,3 @@ export * from './llm-provider.interface';
 export * from './ollama-provider';
 export * from './openai-provider';
 export * from './openrouter-provider';
-export * from './providers';
