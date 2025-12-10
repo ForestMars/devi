@@ -26,6 +26,18 @@ interface Config {
   streaming: boolean;
 }
 
+interface FixResult {
+  confidence: 'high' | 'medium' | 'low';
+  fixType: 'auto' | 'suggestion' | 'manual';
+  description: string;
+  fileChanges: string; // The actual code change content/diff
+}
+
+interface Fix {
+  group: ErrorGroup;
+  fix: FixResult; // This is the required rich object
+}
+
 const DEFAULTS = {
   engine: 'rules' as const,
   model: process.env.OLLAMA_MODEL || 'qwen2.5-coder:32b',
