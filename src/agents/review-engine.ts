@@ -18,6 +18,7 @@ export class ReviewEngine {
 
   constructor(private llm: LLMProvider, configLoader: ConfigLoader) {
     this.configLoader = configLoader;
+    console.log(`🤖 ReviewEngine using: ${this.llm.name} - ${this.llm.getModelName()}`);
     this.promptTemplate = this.configLoader.getAgentContext(agent);
   }
 
@@ -45,6 +46,33 @@ export class ReviewEngine {
       const findings = await this.generateReview(pr, filesToReview);
       
       console.log(`✓ Parsed ${findings.length} finding(s)`);
+      
+      // ========== DETAILED DEBUG LOGGING ==========
+      console.log('\n🔍 ========== FINDINGS DEBUG ==========');
+      console.log(`Total findings: ${findings.length}`);
+      
+      if (findings.length > 0) {
+        findings.forEach((finding, idx) => {
+          console.log(`\n📋 Finding #${idx + 1}:`);
+          console.log(`  - filename: ${finding.filename}`);
+          console.log(`  - line: ${finding.line}`);
+          console.log(`  - severity: ${finding.severity}`);
+          console.log(`  - category: ${finding.category}`);
+          console.log(`  - message: ${finding.message?.substring(0, 100)}${(finding.message?.length || 0) > 100 ? '...' : ''}`);
+          console.log(`  - suggestion: ${finding.suggestion?.substring(0, 100)}${(finding.suggestion?.length || 0) > 100 ? '...' : ''}`);
+        });
+        
+        // Check severity distribution
+        const bySeverity = {
+          high: findings.filter(f => f.severity === 'high').length,
+          medium: findings.filter(f => f.severity === 'medium').length,
+          low: findings.filter(f => f.severity === 'low').length,
+          undefined: findings.filter(f => !f.severity).length
+        };
+        console.log('\n📊 Severity breakdown:', bySeverity);
+      }
+      console.log('🔍 ========== END DEBUG ==========\n');
+      // ============================================
 
       const coreContext: PostReviewContext = {
           llmName: this.llm.name,
@@ -69,6 +97,7 @@ export class ReviewEngine {
       console.log('✅ Review complete!');
     } catch (error: any) {
       console.error(`🔴 Fatal error during review for PR #${prNumber}: ${error.message}`);
+      console.error('Stack trace:', error.stack);
       await context.octokit.issues.createComment({
         owner,
         repo: repoName,
@@ -177,6 +206,12 @@ export class ReviewEngine {
         const response = await this.llm.generateReview(prompt); 
         console.log(`✓ Got response (${response.length} chars)`);
         
+        // ========== DEBUG RAW RESPONSE ==========
+        console.log('\n📄 Raw LLM Response (first 500 chars):');
+        console.log(response.substring(0, 500));
+        console.log('...\n');
+        // =========================================
+        
         const findings = this.parseReviewResponse(response);
         console.log(`✓ Found ${findings.length} issue(s) in this batch`);
         
@@ -279,14 +314,18 @@ ${f.patch || 'No diff available'}
   private parseReviewResponse(rawResponse: string): ReviewFinding[] {
     let jsonString = rawResponse.trim();
     
+    console.log('\n🔍 Parsing LLM response...');
+    
     // Remove markdown code fences if present
     if (jsonString.startsWith('```')) {
+      console.log('  - Removing opening code fence');
       const firstFenceEnd = jsonString.indexOf('\n');
       if (firstFenceEnd !== -1) {
         jsonString = jsonString.substring(firstFenceEnd).trim();
       }
     }
     if (jsonString.endsWith('```')) {
+      console.log('  - Removing closing code fence');
       const lastFenceStart = jsonString.lastIndexOf('```');
       if (lastFenceStart !== -1) {
         jsonString = jsonString.substring(0, lastFenceStart).trim();
@@ -297,6 +336,8 @@ ${f.patch || 'No diff available'}
     const start = jsonString.indexOf('[');
     const end = jsonString.lastIndexOf(']');
     
+    console.log(`  - Found JSON array bounds: start=${start}, end=${end}`);
+    
     if (start === -1 || end === -1 || start >= end) {
       console.error(`🔴 PARSE FAIL: Cannot find valid array boundaries in response.`);
       console.error(`RAW RESPONSE SNIPPET: ${jsonString.substring(0, 500)}`);
@@ -304,9 +345,12 @@ ${f.patch || 'No diff available'}
     }
     
     const arrayContent = jsonString.substring(start, end + 1);
+    console.log(`  - Extracted JSON array (${arrayContent.length} chars)`);
     
     try {
-      return JSON.parse(arrayContent) as ReviewFinding[];
+      const parsed = JSON.parse(arrayContent) as ReviewFinding[];
+      console.log(`  ✓ Successfully parsed ${parsed.length} findings`);
+      return parsed;
     } catch (error) {
       console.error('🔴 PARSE FAIL: JSON syntax error', error);
       console.error(`Failed String: ${arrayContent.substring(0, 500)}...`);

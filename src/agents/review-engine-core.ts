@@ -9,7 +9,6 @@ export class ReviewEngineCore {
 
     constructor(context: PostReviewContext, filesToReview: PRFile[]) {
         this.context = context;
-        // This is the correct location for the .map() call
         this.filePatches = new Map<string, string>(
             filesToReview.map(f => [f.filename, f.patch || ''])
         );
@@ -19,14 +18,22 @@ export class ReviewEngineCore {
         const hunkRegex = /@@ -\d+,\d+ \+(\d+),(\d+) @@/g;
         let match;
 
+        console.log(`  🔍 Checking if line ${line} is in hunk for patch:`);
+        console.log(`     Patch preview: ${patch.substring(0, 200)}...`);
+
         while ((match = hunkRegex.exec(patch)) !== null) {
             const startLine = parseInt(match[1], 10);
             const numLines = parseInt(match[2], 10);
+            const endLine = startLine + numLines;
+            
+            console.log(`     Hunk range: ${startLine}-${endLine} (checking ${line})`);
 
             if (line >= startLine && line < startLine + numLines) {
+                console.log(`     ✓ Line ${line} IS in hunk ${startLine}-${endLine}`);
                 return true;
             }
         }
+        console.log(`     ✗ Line ${line} NOT in any hunk`);
         return false;
     }
 
@@ -56,61 +63,110 @@ export class ReviewEngineCore {
         }
         
         body += `Found ${findings.length} issue${findings.length !== 1 ? 's' : ''}:\n\n`;
+        
         const highFindings = findings.filter(f => f.severity === 'high');
         const mediumFindings = findings.filter(f => f.severity === 'medium');
+        const lowFindings = findings.filter(f => f.severity === 'low');
+        const otherFindings = findings.filter(f => !f.severity || (f.severity !== 'high' && f.severity !== 'medium' && f.severity !== 'low'));
+
+        console.log(`\n📊 Building review body with:`);
+        console.log(`  - High: ${highFindings.length}`);
+        console.log(`  - Medium: ${mediumFindings.length}`);
+        console.log(`  - Low: ${lowFindings.length}`);
+        console.log(`  - Other/Unspecified: ${otherFindings.length}`);
 
         // --- High Priority Findings ---
         if (highFindings.length > 0) {
             body += `### 🔴 High Priority (${highFindings.length})\n`;
             highFindings.forEach(f => {
-                body += `* [${f.category.toUpperCase()}] **${f.filename}${f.line ? `:${f.line}` : ''}**: ${f.message}\n`;
+                body += `* **[${f.category.toUpperCase()}]** \`${f.filename}${f.line ? `:${f.line}` : ''}\`\n`;
+                body += `  ${f.message}\n`;
+                if (f.suggestion) {
+                    body += `  💡 *${f.suggestion}*\n`;
+                }
+                body += '\n';
             });
-            body += '\n';
         }
         
         // --- Medium Priority Findings ---
         if (mediumFindings.length > 0) {
             body += `### 🟡 Medium Priority (${mediumFindings.length})\n`;
             mediumFindings.forEach(f => {
-                body += `* [${f.category.toUpperCase()}] **${f.filename}${f.line ? `:${f.line}` : ''}**: ${f.message}\n`;
+                body += `* **[${f.category.toUpperCase()}]** \`${f.filename}${f.line ? `:${f.line}` : ''}\`\n`;
+                body += `  ${f.message}\n`;
+                if (f.suggestion) {
+                    body += `  💡 *${f.suggestion}*\n`;
+                }
+                body += '\n';
             });
-            body += '\n';
         }
+
+        // --- Low Priority Findings ---
+        if (lowFindings.length > 0) {
+            body += `### 🔵 Low Priority (${lowFindings.length})\n`;
+            lowFindings.forEach(f => {
+                body += `* **[${f.category.toUpperCase()}]** \`${f.filename}${f.line ? `:${f.line}` : ''}\`\n`;
+                body += `  ${f.message}\n`;
+                if (f.suggestion) {
+                    body += `  💡 *${f.suggestion}*\n`;
+                }
+                body += '\n';
+            });
+        }
+
+        // --- Other Findings (without severity or unrecognized severity) ---
+        if (otherFindings.length > 0) {
+            body += `### 📝 Other Issues (${otherFindings.length})\n`;
+            otherFindings.forEach(f => {
+                body += `* **[${f.category.toUpperCase()}]** \`${f.filename}${f.line ? `:${f.line}` : ''}\`\n`;
+                body += `  ${f.message}\n`;
+                if (f.suggestion) {
+                    body += `  💡 *${f.suggestion}*\n`;
+                }
+                body += '\n';
+            });
+        }
+
+        console.log(`\n📝 Review body length: ${body.length} chars`);
 
         // --- Prepare Inline Comments ---
         const comments = findings
             .filter(f => f.line !== undefined)
-            .filter(f => {
+            .map(f => {
                 const line = f.line!;
                 const patch = this.filePatches.get(f.filename);
                 
                 if (!patch) {
                     console.warn(`[VALIDATION_SKIP] Patch not found for ${f.filename}. Skipping inline comment.`);
-                    return false;
+                    return null;
                 }
 
                 if (line <= 0) {
                     console.warn(`[VALIDATION_FAIL] Skipping finding for ${f.filename}:${line}. Line number is invalid.`);
-                    return false;
+                    return null;
                 }
 
                 if (!this.isLineInHunk(patch, line)) {
-                    console.warn(`[VALIDATION_FAIL] Skipping finding for ${f.filename}:${line}. Line not found in patch hunk range.`);
-                    return false;
+                    console.warn(`[VALIDATION_FAIL] Skipping finding for ${f.filename}:${line}. Line not in diff hunk.`);
+                    return null;
                 }
                 
                 console.log(`[VALIDATION_SUCCESS] Posting comment on ${f.filename}:${line}.`);
-                return true; 
+                
+                return {
+                    path: f.filename,
+                    line: line,
+                    side: 'RIGHT',
+                    body: `**[${f.severity?.toUpperCase() || 'ISSUE'} - ${f.category.toUpperCase()}]** ${f.message}\n\n💡 *Suggestion*: ${f.suggestion || 'Review and address this issue.'}`
+                };
             })
-            .map(f => ({
-                path: f.filename,
-                line: f.line,  
-                side: 'RIGHT' as const,
-                body: `**[${f.severity.toUpperCase()} ${f.category.toUpperCase()}]** ${f.message}\n\n*Suggestion*: ${f.suggestion}`
-            }));
+            .filter((c): c is NonNullable<typeof c> => c !== null);
+
+        console.log(`\n💬 Inline comments to post: ${comments.length}`);
 
         // --- Post Review or Comment ---
         if (comments.length === 0 && findings.length > 0) {
+            console.log('📤 Posting as issue comment (no valid inline comments)');
             await githubContext.octokit.issues.createComment({
                 owner,
                 repo: repoName,
@@ -119,9 +175,11 @@ export class ReviewEngineCore {
             });
             return;
         } else if (comments.length === 0 && findings.length === 0) {
-             return; 
+            console.log('✓ No findings to post');
+            return; 
         }
 
+        console.log('📤 Posting as PR review with inline comments');
         await githubContext.octokit.pulls.createReview({
             owner,
             repo: repoName,

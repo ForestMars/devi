@@ -1,0 +1,39 @@
+$ bun run build:barrels && tsc
+$ barrelsby --directory ./src/providers --delete --singleQuotes --location all
+src/agents/review-engine-core.ts(4,58): error TS2835: Relative import paths need explicit file extensions in ECMAScript imports when '--moduleResolution' is 'node16' or 'nodenext'. Did you mean './review-engine-types.js'?
+src/agents/review-engine.ts(4,29): error TS2834: Relative import paths need explicit file extensions in ECMAScript imports when '--moduleResolution' is 'node16' or 'nodenext'. Consider adding an extension to the import path.
+src/agents/review-engine.ts(5,30): error TS2835: Relative import paths need explicit file extensions in ECMAScript imports when '--moduleResolution' is 'node16' or 'nodenext'. Did you mean '../config/config-loader.js'?
+src/agents/review-engine.ts(6,34): error TS2835: Relative import paths need explicit file extensions in ECMAScript imports when '--moduleResolution' is 'node16' or 'nodenext'. Did you mean './review-engine-core.js'?
+src/agents/review-engine.ts(7,71): error TS2835: Relative import paths need explicit file extensions in ECMAScript imports when '--moduleResolution' is 'node16' or 'nodenext'. Did you mean './review-engine-types.js'?
+src/agents/review-engine.ts(102,31): error TS7006: Parameter 'pattern' implicitly has an 'any' type.
+src/config/config-loader.ts(10,8): error TS2835: Relative import paths need explicit file extensions in ECMAScript imports when '--moduleResolution' is 'node16' or 'nodenext'. Did you mean '../providers/index.js'?
+src/config/config-loader.ts(11,18): error TS7016: Could not find a declaration file for module 'js-yaml'. '/Users/forestmars/sandbox/pedal/node_modules/js-yaml/dist/js-yaml.mjs' implicitly has an 'any' type.
+  Try `npm i --save-dev @types/js-yaml` if it exists or add a new declaration (.d.ts) file containing `declare module 'js-yaml';`
+src/index.ts(4,30): error TS2835: Relative import paths need explicit file extensions in ECMAScript imports when '--moduleResolution' is 'node16' or 'nodenext'. Did you mean './config/config-loader.js'?
+src/index.ts(5,30): error TS2835: Relative import paths need explicit file extensions in ECMAScript imports when '--moduleResolution' is 'node16' or 'nodenext'. Did you mean './agents/review-engine.js'?
+src/index.ts(84,77): error TS2339: Property 'action' does not exist on type 'BranchProtectionConfigurationDisabledEvent | BranchProtectionConfigurationEnabledEvent | ... 436 more ... | WorkflowDispatchEvent'.
+  Property 'action' does not exist on type 'never'.
+src/pr-test.ts(4,25): error TS2307: Cannot find module '@octokit/rest' or its corresponding type declarations.
+src/pr-test.ts(5,30): error TS2835: Relative import paths need explicit file extensions in ECMAScript imports when '--moduleResolution' is 'node16' or 'nodenext'. Did you mean './agents/review-engine.js'?
+src/pr-test.ts(6,32): error TS2834: Relative import paths need explicit file extensions in ECMAScript imports when '--moduleResolution' is 'node16' or 'nodenext'. Consider adding an extension to the import path.
+src/pr-test.ts(60,19): error TS7006: Parameter 'f' implicitly has an 'any' type.
+src/pr-test.ts(131,25): error TS7006: Parameter 'finding' implicitly has an 'any' type.
+src/pr-test.ts(131,34): error TS7006: Parameter 'i' implicitly has an 'any' type.
+src/pr-test.ts(141,36): error TS7006: Parameter 'f' implicitly has an 'any' type.
+src/pr-test.ts(142,38): error TS7006: Parameter 'f' implicitly has an 'any' type.
+src/providers/api-provider-base.ts(1,29): error TS2307: Cannot find module './llm-provider.interface' or its corresponding type declarations.
+src/providers/claude-provider.ts(3,40): error TS2304: Cannot find name 'LLMProvider'.
+src/providers/gemini-provider.ts(3,40): error TS2304: Cannot find name 'LLMProvider'.
+src/providers/index.ts(5,15): error TS2835: Relative import paths need explicit file extensions in ECMAScript imports when '--moduleResolution' is 'node16' or 'nodenext'. Did you mean './api-provider-base.js'?
+src/providers/index.ts(6,15): error TS2835: Relative import paths need explicit file extensions in ECMAScript imports when '--moduleResolution' is 'node16' or 'nodenext'. Did you mean './claude-provider.js'?
+src/providers/index.ts(7,15): error TS2835: Relative import paths need explicit file extensions in ECMAScript imports when '--moduleResolution' is 'node16' or 'nodenext'. Did you mean './gemini-provider.js'?
+src/providers/index.ts(8,15): error TS2307: Cannot find module './llm-provider.interface' or its corresponding type declarations.
+src/providers/index.ts(9,15): error TS2835: Relative import paths need explicit file extensions in ECMAScript imports when '--moduleResolution' is 'node16' or 'nodenext'. Did you mean './ollama-provider.js'?
+src/providers/index.ts(10,15): error TS2835: Relative import paths need explicit file extensions in ECMAScript imports when '--moduleResolution' is 'node16' or 'nodenext'. Did you mean './openai-provider.js'?
+src/providers/index.ts(11,15): error TS2835: Relative import paths need explicit file extensions in ECMAScript imports when '--moduleResolution' is 'node16' or 'nodenext'. Did you mean './openrouter-provider.js'?
+src/providers/ollama-provider.ts(3,48): error TS2835: Relative import paths need explicit file extensions in ECMAScript imports when '--moduleResolution' is 'node16' or 'nodenext'. Did you mean './api-provider-base.js'?
+src/providers/ollama-provider.ts(18,26): error TS2339: Property 'host' does not exist on type 'OllamaProvider'.
+src/providers/ollama-provider.ts(21,29): error TS2339: Property 'model' does not exist on type 'OllamaProvider'.
+src/providers/ollama-provider.ts(26,39): error TS2339: Property 'maxOutputTokens' does not exist on type 'OllamaProvider'.
+src/providers/openai-provider.ts(3,40): error TS2304: Cannot find name 'LLMProvider'.
+src/providers/openrouter-provider.ts(3,44): error TS2304: Cannot find name 'LLMProvider'.

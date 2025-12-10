@@ -9,18 +9,17 @@ settings:
 # LLM Provider Configuration
 llm:
   default_provider: "ollama"
-  default_model: "qwen3-coder:latest"
+  default_model: "qwen2.5-coder:7b"
   
   providers:
     ollama:
       host: "http://localhost:11434"
       models:
         - "qwen2.5-coder:7b"
-        - "qwen2.5-coder:14b"
         - "qwen2.5-coder:32b"
         - "qwen-coder:pedal"
         - "deepseek-r1:latest"
-        - "codellama"
+        - "codellama:latest"
         - "deepseek-coder-v2:16b"
         - "qwen3-coder:latest"
     
@@ -90,9 +89,9 @@ agents:
   # Reviews code in PRs
   pr-review:
     # model: "ollama:qwen-coder:pedal"
-    # model: "ollama:qwen2.5-coder:7b"
+    model: "ollama:qwen2.5-coder:7b"
     # model: "ollama:deepseek-r1:latest"
-    model: "deepseek-coder-v2:16b"
+    # model: "deepseek-coder-v2:16b"
     max_output_tokens: 4096
     triggers:
       - event: "pull_request.opened"
