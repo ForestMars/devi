@@ -5,6 +5,8 @@ import { LLMProvider } from '../providers';
 import { ConfigLoader } from '../config/config-loader';
 import { ReviewEngineCore } from './review-engine-core';
 import { PRFile, ReviewFinding, FilterStats, PostReviewContext } from './review-engine-types';
+import * as fs from 'fs';
+import * as path from 'path';
 
 const agent = 'pr-review';
 
@@ -18,14 +20,21 @@ export class ReviewEngine {
     const modelName = this.llm.getModelName();
     console.log(`🤖 ReviewEngine using: ${this.llm.name} - ${modelName}`);
     
-    // Load prompt ONCE at construction
+    // Load prompt ONCE at construction - with fallback to file reading
     this.promptTemplate = this.configLoader.getAgentContext(agent);
     
     if (!this.promptTemplate || this.promptTemplate.trim().length === 0) {
-      throw new Error(`Failed to load prompt template for agent: ${agent}`);
+      console.warn(`⚠️  getAgentContext returned empty, trying direct file read...`);
+      const promptPath = this.configLoader.getPromptFilePath(agent);
+      try {
+        this.promptTemplate = fs.readFileSync(promptPath, 'utf8');
+        console.log(`✓ Loaded prompt from file: ${promptPath} (${this.promptTemplate.length} chars)`);
+      } catch (e: any) {
+        throw new Error(`Failed to load prompt template for agent ${agent}: ${e.message}`);
+      }
+    } else {
+      console.log(`✓ Loaded prompt template (${this.promptTemplate.length} chars)`);
     }
-    
-    console.log(`✓ Loaded prompt template (${this.promptTemplate.length} chars)`);
   }
 
   async reviewPR(context: Context, pr: any, repo: any): Promise<void> {
