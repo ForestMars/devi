@@ -4,7 +4,7 @@
  * Exported function: analyzeWithAnalyser
  *
  * @author Me and Mr. Fixit
- * @version 0.0.1
+ * @version 0.0.2
  * @license MIT
  */
 
@@ -19,6 +19,46 @@ interface Config {
   outputJsonPath: string;
   outputTxtPath: string;
   streaming: boolean;
+}
+
+/**
+ * Parse LLM response and extract FixResult JSON
+ */
+function parseLLMResponse(responseText: string): Partial<FixResult> {
+  try {
+    // Try direct JSON parse first
+    return JSON.parse(responseText);
+  } catch (firstError) {
+    // Try to extract JSON from markdown code blocks
+    try {
+      const jsonBlockMatch = responseText.match(/```(?:json)?\s*\n?([\s\S]*?)\n?```/);
+      if (jsonBlockMatch && jsonBlockMatch[1]) {
+        return JSON.parse(jsonBlockMatch[1].trim());
+      }
+
+      // Try to find JSON object boundaries
+      const jsonObjectMatch = responseText.match(/\{[\s\S]*\}/);
+      if (jsonObjectMatch) {
+        return JSON.parse(jsonObjectMatch[0]);
+      }
+
+      // If all parsing fails, treat as plain text description
+      return {
+        confidence: 'low',
+        fixType: 'suggestion',
+        description: responseText.trim(),
+        fileChanges: ''
+      };
+    } catch (extractError) {
+      // Last resort: return the raw text as description
+      return {
+        confidence: 'low',
+        fixType: 'suggestion',
+        description: responseText.trim() || 'No solution generated',
+        fileChanges: ''
+      };
+    }
+  }
 }
 
 /**
@@ -53,7 +93,7 @@ export async function analyzeWithAnalyser(
         .replace(/\{\{ERROR_COUNT\}\}/g, group.count.toString())
         .replace(/\{\{EXAMPLE_ERRORS\}\}/g, exampleErrors);
     } else {
-      prompt = `Immediately return this: "Context not found. Nothing to do."`;
+      prompt = `Analyze TypeScript error ${group.code}: ${group.pattern}. Return JSON with: confidence, fixType, description, fileChanges.`;
     }
 
     try {
@@ -67,7 +107,7 @@ export async function analyzeWithAnalyser(
           stream: config.streaming,
           options: {
             temperature: 0.2,
-            num_predict: 300
+            num_predict: 500
           }
         }),
         signal: AbortSignal.timeout(300_000)
@@ -78,7 +118,7 @@ export async function analyzeWithAnalyser(
         throw new Error(`Ollama API error: ${response.status} - ${text}`);
       }
 
-      let fixDescription: string;
+      let rawResponse: string;
 
       if (config.streaming) {
         console.log(`   ⏳ Streaming response...`);
@@ -91,22 +131,29 @@ export async function analyzeWithAnalyser(
             if (obj.response) output += obj.response;
           } catch {}
         }
-        fixDescription = output || 'No solution generated';
+        rawResponse = output || 'No solution generated';
       } else {
         const data = await response.json();
-        fixDescription = data.response || 'No solution generated';
+        rawResponse = data.response || 'No solution generated';
       }
 
       const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
-      console.log(`   ✅ Done in ${elapsed}s\n`);
+      console.log(`   ✅ Done in ${elapsed}s`);
 
-      // Create a properly structured FixResult object
+      // Parse the LLM response into a FixResult structure
+      const parsed = parseLLMResponse(rawResponse);
+      
+      // Build complete FixResult with defaults for missing fields
       const fixResult: FixResult = {
-        confidence: 'medium',
-        fixType: 'suggestion',
-        description: fixDescription,
-        fileChanges: group.errors.map(e => e.file).join(', ')
+        confidence: parsed.confidence || 'medium',
+        fixType: parsed.fixType || 'suggestion',
+        description: parsed.description || rawResponse,
+        fileChanges: parsed.fileChanges || group.errors.map(e => e.file).join(', '),
+        commands: parsed.commands || [],
+        manualSteps: parsed.manualSteps || []
       };
+
+      console.log(`   📋 Fix type: ${fixResult.fixType}, confidence: ${fixResult.confidence}\n`);
 
       results.push({ group, fix: fixResult });
 
@@ -127,7 +174,9 @@ export async function analyzeWithAnalyser(
         confidence: 'low',
         fixType: 'manual',
         description: `Error: ${errorMsg}`,
-        fileChanges: ''
+        fileChanges: '',
+        commands: [],
+        manualSteps: ['Investigate the error manually', 'Check Ollama service status']
       };
 
       results.push({ group, fix: errorFixResult });
