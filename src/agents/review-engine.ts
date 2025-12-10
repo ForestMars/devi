@@ -1,14 +1,12 @@
-// src/review-engine.ts
+// src/review-engine.ts - CLEANED UP VERSION
 
 import { Context } from 'probot';
 import { LLMProvider } from '../providers';
 import { ConfigLoader } from '../config/config-loader';
 import { ReviewEngineCore } from './review-engine-core';
 import { PRFile, ReviewFinding, FilterStats, PostReviewContext } from './review-engine-types';
-import * as path from 'path';
-import * as fs from 'fs';
 
-const agent='pr-review'
+const agent = 'pr-review';
 
 export class ReviewEngine {
   private configLoader: ConfigLoader;
@@ -17,8 +15,17 @@ export class ReviewEngine {
 
   constructor(private llm: LLMProvider, configLoader: ConfigLoader) {
     this.configLoader = configLoader;
-    console.log(`🤖 ReviewEngine using: ${this.llm.name} - ${this.llm.getModelName()}`);  // ADD THIS
+    const modelName = this.llm.getModelName();
+    console.log(`🤖 ReviewEngine using: ${this.llm.name} - ${modelName}`);
+    
+    // Load prompt ONCE at construction
     this.promptTemplate = this.configLoader.getAgentContext(agent);
+    
+    if (!this.promptTemplate || this.promptTemplate.trim().length === 0) {
+      throw new Error(`Failed to load prompt template for agent: ${agent}`);
+    }
+    
+    console.log(`✓ Loaded prompt template (${this.promptTemplate.length} chars)`);
   }
 
   async reviewPR(context: Context, pr: any, repo: any): Promise<void> {
@@ -26,6 +33,9 @@ export class ReviewEngine {
     const repoName = repo.name;
     const prNumber = pr.number;
     const initialModelName = this.llm.getModelName();
+    const llmDisplayName = `${this.llm.name} (${initialModelName})`;
+    
+    console.log(`🔍 Starting review with ${llmDisplayName}`);
     
     try {
       const { data: files } = await context.octokit.pulls.listFiles({
@@ -48,7 +58,7 @@ export class ReviewEngine {
 
       const coreContext: PostReviewContext = {
           llmName: this.llm.name,
-          modelName: this.llm.getModelName(),
+          modelName: initialModelName,
           filterStats: this.filterStats
       };
       
@@ -57,23 +67,22 @@ export class ReviewEngine {
       if (findings.length > 0) {
         await core.postReview(context, owner, repoName, prNumber, pr.head.sha, findings);
       } else {
-        console.log('✓ No issues found');
-        const modelName = this.llm.getModelName();
+        console.log(`✓ No issues found by ${llmDisplayName}`);
         await context.octokit.issues.createComment({
           owner,
           repo: repoName,
           issue_number: prNumber,
-          body: `## 🤖 AI Code Review (${this.llm.name} (${modelName}))\n\n✅ No significant issues found. Code looks good!`
+          body: `## 🤖 AI Code Review (${llmDisplayName})\n\n✅ No significant issues found. Code looks good!`
         });
       }
-      console.log('✅ Review complete!');
+      console.log(`✅ Review complete with ${llmDisplayName}!`);
     } catch (error: any) {
-      console.error(`🔴 Fatal error during review for PR #${prNumber}: ${error.message}`);
+      console.error(`🔴 Fatal error during review for PR #${prNumber} using ${llmDisplayName}: ${error.message}`);
       await context.octokit.issues.createComment({
         owner,
         repo: repoName,
         issue_number: prNumber,
-        body: `## 🤖 AI Code Review (${this.llm.name} (${initialModelName}))\n\n❌ Review failed due to internal error: \n\`\`\`\n${error.message}\n\`\`\``
+        body: `## 🤖 AI Code Review (${llmDisplayName})\n\n❌ Review failed due to internal error: \n\`\`\`\n${error.message}\n\`\`\``
       });
     }
   }
@@ -133,11 +142,9 @@ export class ReviewEngine {
     const mergeStrategy = process.env.PR_REVIEW_MERGE_STRATEGY || 'union';
     
     if (!multipassEnabled || numPasses <= 1) {
-      // Single pass (current behavior)
       return this.generateSinglePassReview(pr, files);
     }
     
-    // Multi-pass review
     console.log(`🔄 Running ${numPasses}-pass review with ${mergeStrategy} merge strategy`);
     
     const allRuns: ReviewFinding[][] = [];
@@ -149,7 +156,6 @@ export class ReviewEngine {
       console.log(`✓ Pass ${pass} found ${findings.length} issues`);
     }
     
-    // Merge results based on strategy
     const merged = this.mergeFindings(allRuns, mergeStrategy);
     console.log(`\n✅ Final: ${merged.length} unique issues after ${mergeStrategy} merge`);
     
@@ -171,6 +177,14 @@ export class ReviewEngine {
       batch.forEach(f => console.log(`   - ${f.filename}`));
       
       const prompt = this.buildReviewPrompt(pr, batch);
+      
+      // Validate prompt is not empty
+      if (!prompt || prompt.trim().length === 0) {
+        console.error(`❌ ERROR: Empty prompt generated for batch ${batchNum}!`);
+        console.error(`   This should never happen - prompt template is validated at construction.`);
+        continue;
+      }
+      
       console.log(`📏 Batch prompt: ${prompt.length} chars`);
 
       try {
@@ -192,13 +206,11 @@ export class ReviewEngine {
 
   private mergeFindings(runs: ReviewFinding[][], strategy: string): ReviewFinding[] {
     if (strategy === 'union') {
-      // All findings from all passes
       const all = runs.flat();
       return this.deduplicateFindings(all);
     }
     
     if (strategy === 'intersection') {
-      // Only findings found in ALL passes
       const first = runs[0];
       return first.filter(f1 => 
         runs.every(run => 
@@ -208,7 +220,6 @@ export class ReviewEngine {
     }
     
     if (strategy === 'majority') {
-      // Found in >50% of passes
       const all = runs.flat();
       const threshold = Math.ceil(runs.length / 2);
       
@@ -220,7 +231,7 @@ export class ReviewEngine {
       });
     }
     
-    return runs.flat(); // Default to union
+    return runs.flat();
   }
 
   private deduplicateFindings(findings: ReviewFinding[]): ReviewFinding[] {
@@ -238,13 +249,11 @@ export class ReviewEngine {
 
   private isSameFinding(f1: ReviewFinding, f2: ReviewFinding): boolean {
     return f1.filename === f2.filename &&
-           Math.abs((f1.line || 0) - (f2.line || 0)) <= 2 &&  // Within 2 lines
+           Math.abs((f1.line || 0) - (f2.line || 0)) <= 2 &&
            f1.category === f2.category;
   }
 
   private buildReviewPrompt(pr: any, files: PRFile[]): string {
-    const template = this.loadPromptTemplate();
-    
     const fileContext = files.map(f => `
 ### File: ${f.filename} (${f.status})
 **Changes**: +${f.additions}/-${f.deletions} lines
@@ -253,27 +262,15 @@ ${f.patch || 'No diff available'}
 \`\`\`
 `).join('\n---\n');
 
-    return template
+    // Use the prompt template loaded once at construction
+    const prompt = this.promptTemplate
       .replace('[PR_TITLE]', pr.title || 'No title')
       .replace('[PR_BODY]', pr.body || 'No description')
       .replace('[PR_AUTHOR]', pr.user?.login || 'unknown')
       .replace('[FILE_COUNT]', files.length.toString())
       .replace('[FILE_CONTEXT]', fileContext);
-  }
 
-  private loadPromptTemplate(): string {
-    const agentContext = this.configLoader.getAgent('pr-review')?.context;
-    if (agentContext) {
-        return agentContext;
-    }
-
-    const promptPath = this.configLoader.getPromptFilePath(agent);
-    try {
-      return fs.readFileSync(promptPath, 'utf8');
-    } catch (e: any) {
-      console.warn(`Using default prompt - Could not load context from ${promptPath}: ${e.message}`);
-      return `# PR Review Instructions\nFocus on the following areas:\n1. Security\n2. Bugs\n3. Performance\n\nReturn ONLY a JSON array.\n[FILE_CONTEXT]`;
-    }
+    return prompt;
   }
 
   private parseReviewResponse(rawResponse: string): ReviewFinding[] {
