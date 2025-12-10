@@ -22,8 +22,6 @@ export async function analyzeWithAnalyser(
 ): Promise<Array<{ group: ErrorGroup; fix: string }>> {
   const results: Array<{ group: ErrorGroup; fix: FixResult }> = [];
 
-
-
   for (let i = 0; i < groups.length; i++) {
     const group = groups[i];
     const startTime = Date.now(); 
