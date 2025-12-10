@@ -89,7 +89,7 @@ agents:
   # Reviews code in PRs
   pr-review:
     # model: "ollama:qwen-coder:pedal"
-    model: "ollama:qwen2.5-coder:7b"
+    # model: "ollama:qwen2.5-coder:7b"
     # model: "ollama:deepseek-r1:latest"
     # model: "deepseek-coder-v2:16b"
     max_output_tokens: 4096
