@@ -9,7 +9,7 @@ settings:
 # LLM Provider Configuration
 llm:
   default_provider: "ollama"
-  default_model: "qwen3-coder:latest"
+  default_model: "qwen2.5-coder:7b"
   
   providers:
     ollama:
