@@ -1,0 +1,9 @@
+-EXAMPLES:
+-  Analyze build errors with rules engine (fast)
+-  bun run build 2>&1 | bun smart-fix.ts
+-
+-  Top 5 error groups only
+-  bun smart-fix.ts --count 5 --errors build-errors.txt
+-
+-  # Use LLM for unknown errors (research mode)
+-  bun smart-fix.ts --analyzer hybrid --llm-provider claude

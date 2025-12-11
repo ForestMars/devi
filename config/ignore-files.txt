@@ -16,3 +16,6 @@ node_modules/
 ^CHANGELOG/i
 config/env
 \.yml$
+\.png$
+\.jpg$
+
