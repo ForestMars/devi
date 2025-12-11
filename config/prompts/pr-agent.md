@@ -92,7 +92,7 @@ For each file:
 
 ## Output Format
 
-Return a JSON array. Each issue must have these exact fields:
+Return a JSON array. Each issue must have these exact fields. eg: 
 
 ```json
 [
@@ -147,6 +147,13 @@ Return a JSON array. Each issue must have these exact fields:
   "suggestion": "Change validation to: typeof providers === 'object' && !Array.isArray(providers)"
 }
 ```
+
+## CRITICAL REMINDER
+
+- Only flag issues on lines that are shown in the diff (lines starting with + or modified lines)
+- Do NOT report issues on unchanged context lines
+- Each finding must reference an actual line number from the changed code
+- If you see the same issue multiple times, only report it once per line
 
 ## Now Review
 
