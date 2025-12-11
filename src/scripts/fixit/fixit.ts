@@ -5,11 +5,16 @@ import { join } from "path";
 import { spawn } from "bun";
 
 // ---- Paths ----
-const ROOT_DIR = new URL("../../../", import.meta.url).pathname;
+// Get absolute path to repo root more reliably
+const SCRIPT_DIR = import.meta.dir; // Directory containing this script
+const ROOT_DIR = join(SCRIPT_DIR, "../../.."); // Go up to repo root
 const FIX_FILE = join(ROOT_DIR, "ts-fixes.json");
 const WORK_DIR = join(ROOT_DIR, ".fixit");
 const PROMPT_DIR = join(WORK_DIR, "prompts");
 const LOG_DIR = join(WORK_DIR, "logs");
+
+console.log(`Script dir: ${SCRIPT_DIR}`);
+console.log(`Root dir: ${ROOT_DIR}`);
 
 if (!existsSync(PROMPT_DIR)) mkdirSync(PROMPT_DIR, { recursive: true });
 if (!existsSync(LOG_DIR)) mkdirSync(LOG_DIR, { recursive: true });
@@ -34,16 +39,29 @@ for (const [fi, fix] of json.fixes.entries()) {
       try {
         const fileContent = readFileSync(fullFilePath, 'utf-8');
         const fileLines = fileContent.split('\n');
-        const relevantLines = fc.lines
-          .map(lineNum => {
-            const line = fileLines[lineNum - 1]; // Convert 1-indexed to 0-indexed
-            return line ? `Line ${lineNum}: ${line.trim()}` : null;
-          })
-          .filter(Boolean)
-          .join('\n');
         
-        if (relevantLines) {
-          specificInstruction = `${fc.instruction}\n\nCurrent code:\n${relevantLines}`;
+        // For import fixes, show more context (all imports)
+        if (fix.errorCode.match(/TS2835|TS2834/) && fc.path.includes('index.ts')) {
+          // Show all export lines for index files
+          const allExports = fileLines
+            .map((line, idx) => ({ line, num: idx + 1 }))
+            .filter(({ line }) => line.trim().startsWith('export'))
+            .map(({ line, num }) => `Line ${num}: ${line.trim()}`)
+            .join('\n');
+          specificInstruction = `${fc.instruction}\n\nCurrent file exports:\n${allExports}`;
+        } else {
+          // Show specific lines mentioned
+          const relevantLines = fc.lines
+            .map(lineNum => {
+              const line = fileLines[lineNum - 1]; // Convert 1-indexed to 0-indexed
+              return line ? `Line ${lineNum}: ${line.trim()}` : null;
+            })
+            .filter(Boolean)
+            .join('\n');
+          
+          if (relevantLines) {
+            specificInstruction = `${fc.instruction}\n\nCurrent code:\n${relevantLines}`;
+          }
         }
       } catch (err) {
         console.warn(`Warning: Could not read ${fc.path} for specific context`);
@@ -59,6 +77,7 @@ Lines involved: ${JSON.stringify(fc.lines)}
 Instruction:
 ${specificInstruction}
 
+IMPORTANT: Only add .js extension to relative imports/exports (those starting with ./ or ../). Do NOT add .js to npm packages or directory re-exports that are already correct.
 Make only the minimal changes needed to fix this error. Do not modify anything else.`;
 
     pipeline.push({ promptPath, filePath: fc.path, logPath, prompt });
@@ -88,10 +107,9 @@ async function runPipeline() {
           "aider",
           stage.filePath, // Use relative path from ROOT_DIR
           "--model", "ollama/qwen2.5-coder:7b", // 7B model for better accuracy
-          "--edit-format", "udiff",
+          "--edit-format", "diff", // Use search/replace format instead of udiff
           "--yes",
-          "--no-auto-commits",
-          "--no-git",
+          "--no-auto-commits", // Don't auto-commit, but still use git
           "--message", stage.prompt
         ],
         cwd: ROOT_DIR, // Run from repo root
