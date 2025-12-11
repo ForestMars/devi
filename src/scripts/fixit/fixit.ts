@@ -19,14 +19,36 @@ console.log(`Loading fixes from ${FIX_FILE}`);
 const json = JSON.parse(readFileSync(FIX_FILE, "utf-8"));
 
 // ---- Build pipeline stages ----
-type Stage = { promptPath: string; file: string; logPath: string; prompt: string };
+type Stage = { promptPath: string; filePath: string; logPath: string; prompt: string };
 const pipeline: Stage[] = [];
 
 for (const [fi, fix] of json.fixes.entries()) {
   for (const [ci, fc] of fix.fileChanges.entries()) {
     const promptPath = join(PROMPT_DIR, `fix-${fi}-${ci}.txt`);
     const logPath = join(LOG_DIR, `fix-${fi}-${ci}.log`);
-    const file = join(ROOT_DIR, fc.path);
+    const fullFilePath = join(ROOT_DIR, fc.path);
+
+    // Read the actual lines from the file to make prompts specific
+    let specificInstruction = fc.instruction;
+    if (existsSync(fullFilePath) && fc.lines && fc.lines.length > 0) {
+      try {
+        const fileContent = readFileSync(fullFilePath, 'utf-8');
+        const fileLines = fileContent.split('\n');
+        const relevantLines = fc.lines
+          .map(lineNum => {
+            const line = fileLines[lineNum - 1]; // Convert 1-indexed to 0-indexed
+            return line ? `Line ${lineNum}: ${line.trim()}` : null;
+          })
+          .filter(Boolean)
+          .join('\n');
+        
+        if (relevantLines) {
+          specificInstruction = `${fc.instruction}\n\nCurrent code:\n${relevantLines}`;
+        }
+      } catch (err) {
+        console.warn(`Warning: Could not read ${fc.path} for specific context`);
+      }
+    }
 
     const prompt = `Error group: ${fix.errorCode}
 Group description: ${fix.description}
@@ -35,11 +57,11 @@ Target file: ${fc.path}
 Lines involved: ${JSON.stringify(fc.lines)}
 
 Instruction:
-${fc.instruction}
+${specificInstruction}
 
 Make only the minimal changes needed to fix this error. Do not modify anything else.`;
 
-    pipeline.push({ promptPath, file, logPath, prompt });
+    pipeline.push({ promptPath, filePath: fc.path, logPath, prompt });
 
     writeFileSync(promptPath, prompt);
     console.log(`Prepared prompt: ${promptPath}`);
@@ -49,63 +71,76 @@ Make only the minimal changes needed to fix this error. Do not modify anything e
 // ---- Run pipeline ----
 async function runPipeline() {
   console.log(`Running pipeline with ${pipeline.length} stages`);
-  const TIMEOUT_MS = 300000; // 2 minutes timeout per stage
+  const TIMEOUT_MS = 180000; // 3 minutes timeout per stage (7B model is slower)
 
   for (const [index, stage] of pipeline.entries()) {
     console.log(`\n=== Stage ${index + 1}/${pipeline.length} ===`);
-    console.log(`Target file: ${stage.file}`);
+    console.log(`Target file: ${stage.filePath}`);
     console.log(`Prompt file: ${stage.promptPath}`);
     console.log(`Log file: ${stage.logPath}`);
+
+    const startTime = Date.now();
+    let timedOut = false;
 
     try {
       const process = spawn({
         cmd: [
           "aider",
-          stage.file,
-          "--model", "qwen2.5-coder:1.5b",
+          stage.filePath, // Use relative path from ROOT_DIR
+          "--model", "ollama/qwen2.5-coder:7b", // 7B model for better accuracy
           "--edit-format", "udiff",
           "--yes",
+          "--no-auto-commits",
+          "--no-git",
           "--message", stage.prompt
         ],
+        cwd: ROOT_DIR, // Run from repo root
         stdout: "pipe",
         stderr: "pipe",
       });
 
-      // Race between process completion and timeout
-      const timeoutPromise = new Promise((_, reject) =>
-        setTimeout(() => reject(new Error("Timeout")), TIMEOUT_MS)
-      );
+      // Set up timeout that will kill the process
+      const timeoutId = setTimeout(() => {
+        console.log(`⏱️  Timeout reached, killing process...`);
+        timedOut = true;
+        process.kill();
+      }, TIMEOUT_MS);
 
-      const processPromise = (async () => {
-        const stdout = await process.stdout.text();
-        const stderr = await process.stderr.text();
-        const exit = await process.exited;
-        return { stdout, stderr, exitCode: exit.exitCode };
-      })();
+      const stdout = await process.stdout.text();
+      const stderr = await process.stderr.text();
+      const exit = await process.exited;
 
-      const result = await Promise.race([processPromise, timeoutPromise]) as {
-        stdout: string;
-        stderr: string;
-        exitCode: number;
-      };
+      clearTimeout(timeoutId);
 
-      console.log(`Aider exit code: ${result.exitCode}`);
-      if (result.stderr.trim().length > 0) console.log(`Aider stderr: ${result.stderr}`);
+      const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
+      console.log(`Completed in ${elapsed}s`);
 
-      writeFileSync(stage.logPath, `STDOUT:\n${result.stdout}\n\nSTDERR:\n${result.stderr}`);
+      if (timedOut) {
+        console.error(`✗ Process was killed due to timeout`);
+        writeFileSync(stage.logPath, `ERROR: Timeout after ${TIMEOUT_MS / 1000}s\n\nPartial STDOUT:\n${stdout}\n\nPartial STDERR:\n${stderr}`);
+        continue;
+      }
+
+      // Bun returns exit code directly, not in exitCode property
+      const exitCode = typeof exit === 'number' ? exit : (exit as any).exitCode ?? -1;
+      console.log(`Aider exit code: ${exitCode}`);
+      if (stderr.trim().length > 0) console.log(`Aider stderr: ${stderr}`);
+
+      writeFileSync(stage.logPath, `STDOUT:\n${stdout}\n\nSTDERR:\n${stderr}`);
       console.log(`Aider output saved to: ${stage.logPath}`);
 
-      if (result.exitCode === 0) {
+      if (exitCode === 0) {
         console.log(`✓ File updated successfully`);
       } else {
-        console.error(`✗ Aider failed with exit code ${result.exitCode}`);
+        console.error(`✗ Aider failed with exit code ${exitCode}`);
       }
     } catch (err) {
       if (err instanceof Error && err.message === "Timeout") {
-        console.error(`✗ Aider timed out after ${TIMEOUT_MS / 1000}s for ${stage.file}`);
+        console.error(`✗ Aider timed out after ${TIMEOUT_MS / 1000}s for ${stage.filePath}`);
         writeFileSync(stage.logPath, `ERROR: Timeout after ${TIMEOUT_MS / 1000}s`);
       } else {
-        console.error(`Error running Aider for ${stage.file}:`, err);
+        console.error(`Error running Aider for ${stage.filePath}:`, err);
+        writeFileSync(stage.logPath, `ERROR: ${err}`);
       }
     }
   }
