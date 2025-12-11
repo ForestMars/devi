@@ -1,5 +1,4 @@
 // src/review-engine.ts
-// version bump
 
 import { Context } from 'probot';
 import { LLMProvider } from '../providers';
@@ -197,10 +196,19 @@ export class ReviewEngine {
       const totalBatches = Math.ceil(files.length / BATCH_SIZE);
       
       console.log(`\n📦 Reviewing batch ${batchNum}/${totalBatches} (${batch.length} files):`);
-      batch.forEach(f => console.log(`   - ${f.filename}`));
+      batch.forEach(f => {
+        console.log(`   - ${f.filename} (${f.changes} changes, patch: ${f.patch ? f.patch.length : 0} chars)`);
+        if (!f.patch || f.patch.length === 0) {
+          console.warn(`   ⚠️  WARNING: ${f.filename} has no patch data!`);
+        }
+      });
       
       const prompt = this.buildReviewPrompt(pr, batch);
       console.log(`📏 Batch prompt: ${prompt.length} chars`);
+      
+      // Debug: Show what files are in this batch
+      console.log(`📄 Files in batch: ${batch.map(f => f.filename).join(', ')}`);
+      console.log(`📊 Total changes in batch: ${batch.reduce((sum, f) => sum + f.changes, 0)} lines`);
 
       try {
         const response = await this.llm.generateReview(prompt); 
@@ -299,12 +307,19 @@ ${f.patch || 'No diff available'}
   private loadPromptTemplate(): string {
     const agentContext = this.configLoader.getAgent('pr-review')?.context;
     if (agentContext) {
+        console.log('📣 Using agent context from config');
+        console.log(`📏 Agent context length: ${agentContext.length} chars`);
+        console.log(`📄 Agent context preview: ${agentContext.substring(0, 200)}...`);
         return agentContext;
     }
 
     const promptPath = this.configLoader.getPromptFilePath(agent);
+    console.log(`📣 Loading prompt from file: ${promptPath}`);
     try {
-      return fs.readFileSync(promptPath, 'utf8');
+      const template = fs.readFileSync(promptPath, 'utf8');
+      console.log(`📏 Prompt template length: ${template.length} chars`);
+      console.log(`📄 Prompt template preview: ${template.substring(0, 200)}...`);
+      return template;
     } catch (e: any) {
       console.warn(`Using default prompt - Could not load context from ${promptPath}: ${e.message}`);
       return `# PR Review Instructions\nFocus on the following areas:\n1. Security\n2. Bugs\n3. Performance\n\nReturn ONLY a JSON array.\n[FILE_CONTEXT]`;
