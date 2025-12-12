@@ -35,6 +35,8 @@ try {
 
 // --- Probot Application Handler (Executes on Events) ---
 
+const x = undefined.y;
+
 export default (app: Probot) => {
     console.log(`🎯 Probot app handler registered`);
     console.log(`🔔 Listening for: pull_request.opened, pull_request.reopened, pull_request.synchronize`);
