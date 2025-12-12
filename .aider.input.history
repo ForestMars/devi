@@ -49,3 +49,1755 @@
 
 # 2025-12-07 06:02:17.418902
 +a
+
+# 2025-12-10 23:31:02.703055
++Error group: TS2835
++Group description: Add .js extensions to 15 import statements across 7 files
++
++Target file: src/agents/review-engine-core.ts
++Lines involved: [4]
++
++Instruction:
++Add .js extension to all relative import statements on lines: 4. Change patterns like "from './foo'" to "from './foo.js'" and "from '../bar/baz'" to "from '../bar/baz.js'"
++
++Make only the minimal changes needed to fix this error. Do not modify anything else.
+
+# 2025-12-10 23:31:02.703291
++Error group: TS2835
++Group description: Add .js extensions to 15 import statements across 7 files
++
++Target file: src/agents/review-engine-core.ts
++Lines involved: [4]
++
++Instruction:
++Add .js extension to all relative import statements on lines: 4. Change patterns like "from './foo'" to "from './foo.js'" and "from '../bar/baz'" to "from '../bar/baz.js'"
++
++Make only the minimal changes needed to fix this error. Do not modify anything else.
+
+# 2025-12-10 23:39:02.942720
++Error group: TS2835
++Group description: Add .js extensions to 15 import statements across 7 files
++
++Target file: src/agents/review-engine-core.ts
++Lines involved: [4]
++
++Instruction:
++Add .js extension to all relative import statements on lines: 4. Change patterns like "from './foo'" to "from './foo.js'" and "from '../bar/baz'" to "from '../bar/baz.js'"
++
++Make only the minimal changes needed to fix this error. Do not modify anything else.
+
+# 2025-12-10 23:39:02.942985
++Error group: TS2835
++Group description: Add .js extensions to 15 import statements across 7 files
++
++Target file: src/agents/review-engine-core.ts
++Lines involved: [4]
++
++Instruction:
++Add .js extension to all relative import statements on lines: 4. Change patterns like "from './foo'" to "from './foo.js'" and "from '../bar/baz'" to "from '../bar/baz.js'"
++
++Make only the minimal changes needed to fix this error. Do not modify anything else.
+
+# 2025-12-10 23:47:45.538946
++Error group: TS2835
++Group description: Add .js extensions to 15 import statements across 7 files
++
++Target file: src/agents/review-engine-core.ts
++Lines involved: [4]
++
++Instruction:
++Add .js extension to all relative import statements on lines: 4. Change patterns like "from './foo'" to "from './foo.js'" and "from '../bar/baz'" to "from '../bar/baz.js'"
++
++Make only the minimal changes needed to fix this error. Do not modify anything else.
+
+# 2025-12-10 23:47:45.539835
++Error group: TS2835
++Group description: Add .js extensions to 15 import statements across 7 files
++
++Target file: src/agents/review-engine-core.ts
++Lines involved: [4]
++
++Instruction:
++Add .js extension to all relative import statements on lines: 4. Change patterns like "from './foo'" to "from './foo.js'" and "from '../bar/baz'" to "from '../bar/baz.js'"
++
++Make only the minimal changes needed to fix this error. Do not modify anything else.
+
+# 2025-12-10 23:49:43.921246
++Error group: TS2835
++Group description: Add .js extensions to 15 import statements across 7 files
++
++Target file: src/agents/review-engine.ts
++Lines involved: [5,6,7]
++
++Instruction:
++Add .js extension to all relative import statements on lines: 5, 6, 7. Change patterns like "from './foo'" to "from './foo.js'" and "from '../bar/baz'" to "from '../bar/baz.js'"
++
++Make only the minimal changes needed to fix this error. Do not modify anything else.
+
+# 2025-12-10 23:49:43.922481
++Error group: TS2835
++Group description: Add .js extensions to 15 import statements across 7 files
++
++Target file: src/agents/review-engine.ts
++Lines involved: [5,6,7]
++
++Instruction:
++Add .js extension to all relative import statements on lines: 5, 6, 7. Change patterns like "from './foo'" to "from './foo.js'" and "from '../bar/baz'" to "from '../bar/baz.js'"
++
++Make only the minimal changes needed to fix this error. Do not modify anything else.
+
+# 2025-12-10 23:51:42.421743
++Error group: TS2835
++Group description: Add .js extensions to 15 import statements across 7 files
++
++Target file: src/config/config-loader.ts
++Lines involved: [10]
++
++Instruction:
++Add .js extension to all relative import statements on lines: 10. Change patterns like "from './foo'" to "from './foo.js'" and "from '../bar/baz'" to "from '../bar/baz.js'"
++
++Make only the minimal changes needed to fix this error. Do not modify anything else.
+
+# 2025-12-10 23:51:42.421980
++Error group: TS2835
++Group description: Add .js extensions to 15 import statements across 7 files
++
++Target file: src/config/config-loader.ts
++Lines involved: [10]
++
++Instruction:
++Add .js extension to all relative import statements on lines: 10. Change patterns like "from './foo'" to "from './foo.js'" and "from '../bar/baz'" to "from '../bar/baz.js'"
++
++Make only the minimal changes needed to fix this error. Do not modify anything else.
+
+# 2025-12-10 23:57:17.321270
++Error group: TS2835
++Group description: Add .js extensions to 15 import statements across 7 files
++
++Target file: src/agents/review-engine-core.ts
++Lines involved: [4]
++
++Instruction:
++Add .js extension to all relative import statements on lines: 4. Change patterns like "from './foo'" to "from './foo.js'" and "from '../bar/baz'" to "from '../bar/baz.js'"
++
++Make only the minimal changes needed to fix this error. Do not modify anything else.
+
+# 2025-12-10 23:57:17.326414
++Error group: TS2835
++Group description: Add .js extensions to 15 import statements across 7 files
++
++Target file: src/agents/review-engine-core.ts
++Lines involved: [4]
++
++Instruction:
++Add .js extension to all relative import statements on lines: 4. Change patterns like "from './foo'" to "from './foo.js'" and "from '../bar/baz'" to "from '../bar/baz.js'"
++
++Make only the minimal changes needed to fix this error. Do not modify anything else.
+
+# 2025-12-10 23:57:21.228393
++Error group: TS2835
++Group description: Add .js extensions to 15 import statements across 7 files
++
++Target file: src/agents/review-engine.ts
++Lines involved: [5,6,7]
++
++Instruction:
++Add .js extension to all relative import statements on lines: 5, 6, 7. Change patterns like "from './foo'" to "from './foo.js'" and "from '../bar/baz'" to "from '../bar/baz.js'"
++
++Make only the minimal changes needed to fix this error. Do not modify anything else.
+
+# 2025-12-10 23:57:21.229563
++Error group: TS2835
++Group description: Add .js extensions to 15 import statements across 7 files
++
++Target file: src/agents/review-engine.ts
++Lines involved: [5,6,7]
++
++Instruction:
++Add .js extension to all relative import statements on lines: 5, 6, 7. Change patterns like "from './foo'" to "from './foo.js'" and "from '../bar/baz'" to "from '../bar/baz.js'"
++
++Make only the minimal changes needed to fix this error. Do not modify anything else.
+
+# 2025-12-10 23:57:25.053048
++Error group: TS2835
++Group description: Add .js extensions to 15 import statements across 7 files
++
++Target file: src/config/config-loader.ts
++Lines involved: [10]
++
++Instruction:
++Add .js extension to all relative import statements on lines: 10. Change patterns like "from './foo'" to "from './foo.js'" and "from '../bar/baz'" to "from '../bar/baz.js'"
++
++Make only the minimal changes needed to fix this error. Do not modify anything else.
+
+# 2025-12-10 23:57:25.053303
++Error group: TS2835
++Group description: Add .js extensions to 15 import statements across 7 files
++
++Target file: src/config/config-loader.ts
++Lines involved: [10]
++
++Instruction:
++Add .js extension to all relative import statements on lines: 10. Change patterns like "from './foo'" to "from './foo.js'" and "from '../bar/baz'" to "from '../bar/baz.js'"
++
++Make only the minimal changes needed to fix this error. Do not modify anything else.
+
+# 2025-12-10 23:57:28.844984
++Error group: TS2835
++Group description: Add .js extensions to 15 import statements across 7 files
++
++Target file: src/index.ts
++Lines involved: [4,5]
++
++Instruction:
++Add .js extension to all relative import statements on lines: 4, 5. Change patterns like "from './foo'" to "from './foo.js'" and "from '../bar/baz'" to "from '../bar/baz.js'"
++
++Make only the minimal changes needed to fix this error. Do not modify anything else.
+
+# 2025-12-10 23:57:28.845093
++Error group: TS2835
++Group description: Add .js extensions to 15 import statements across 7 files
++
++Target file: src/index.ts
++Lines involved: [4,5]
++
++Instruction:
++Add .js extension to all relative import statements on lines: 4, 5. Change patterns like "from './foo'" to "from './foo.js'" and "from '../bar/baz'" to "from '../bar/baz.js'"
++
++Make only the minimal changes needed to fix this error. Do not modify anything else.
+
+# 2025-12-11 00:04:17.616941
++Error group: TS2835
++Group description: Add .js extensions to 15 import statements across 7 files
++
++Target file: src/agents/review-engine-core.ts
++Lines involved: [4]
++
++Instruction:
++Add .js extension to all relative import statements on lines: 4. Change patterns like "from './foo'" to "from './foo.js'" and "from '../bar/baz'" to "from '../bar/baz.js'"
++
++Make only the minimal changes needed to fix this error. Do not modify anything else.
+
+# 2025-12-11 00:04:17.617236
++Error group: TS2835
++Group description: Add .js extensions to 15 import statements across 7 files
++
++Target file: src/agents/review-engine-core.ts
++Lines involved: [4]
++
++Instruction:
++Add .js extension to all relative import statements on lines: 4. Change patterns like "from './foo'" to "from './foo.js'" and "from '../bar/baz'" to "from '../bar/baz.js'"
++
++Make only the minimal changes needed to fix this error. Do not modify anything else.
+
+# 2025-12-11 00:06:17.724849
++Error group: TS2835
++Group description: Add .js extensions to 15 import statements across 7 files
++
++Target file: src/agents/review-engine.ts
++Lines involved: [5,6,7]
++
++Instruction:
++Add .js extension to all relative import statements on lines: 5, 6, 7. Change patterns like "from './foo'" to "from './foo.js'" and "from '../bar/baz'" to "from '../bar/baz.js'"
++
++Make only the minimal changes needed to fix this error. Do not modify anything else.
+
+# 2025-12-11 00:06:17.733192
++Error group: TS2835
++Group description: Add .js extensions to 15 import statements across 7 files
++
++Target file: src/agents/review-engine.ts
++Lines involved: [5,6,7]
++
++Instruction:
++Add .js extension to all relative import statements on lines: 5, 6, 7. Change patterns like "from './foo'" to "from './foo.js'" and "from '../bar/baz'" to "from '../bar/baz.js'"
++
++Make only the minimal changes needed to fix this error. Do not modify anything else.
+
+# 2025-12-11 00:08:17.438547
++Error group: TS2835
++Group description: Add .js extensions to 15 import statements across 7 files
++
++Target file: src/config/config-loader.ts
++Lines involved: [10]
++
++Instruction:
++Add .js extension to all relative import statements on lines: 10. Change patterns like "from './foo'" to "from './foo.js'" and "from '../bar/baz'" to "from '../bar/baz.js'"
++
++Make only the minimal changes needed to fix this error. Do not modify anything else.
+
+# 2025-12-11 00:08:17.438805
++Error group: TS2835
++Group description: Add .js extensions to 15 import statements across 7 files
++
++Target file: src/config/config-loader.ts
++Lines involved: [10]
++
++Instruction:
++Add .js extension to all relative import statements on lines: 10. Change patterns like "from './foo'" to "from './foo.js'" and "from '../bar/baz'" to "from '../bar/baz.js'"
++
++Make only the minimal changes needed to fix this error. Do not modify anything else.
+
+# 2025-12-11 00:10:01.084206
++Error group: TS2835
++Group description: Add .js extensions to 15 import statements across 7 files
++
++Target file: src/index.ts
++Lines involved: [4,5]
++
++Instruction:
++Add .js extension to all relative import statements on lines: 4, 5. Change patterns like "from './foo'" to "from './foo.js'" and "from '../bar/baz'" to "from '../bar/baz.js'"
++
++Make only the minimal changes needed to fix this error. Do not modify anything else.
+
+# 2025-12-11 00:10:01.084612
++Error group: TS2835
++Group description: Add .js extensions to 15 import statements across 7 files
++
++Target file: src/index.ts
++Lines involved: [4,5]
++
++Instruction:
++Add .js extension to all relative import statements on lines: 4, 5. Change patterns like "from './foo'" to "from './foo.js'" and "from '../bar/baz'" to "from '../bar/baz.js'"
++
++Make only the minimal changes needed to fix this error. Do not modify anything else.
+
+# 2025-12-11 00:12:20.856149
++Error group: TS2835
++Group description: Add .js extensions to 15 import statements across 7 files
++
++Target file: src/agents/review-engine-core.ts
++Lines involved: [4]
++
++Instruction:
++Add .js extension to all relative import statements on lines: 4. Change patterns like "from './foo'" to "from './foo.js'" and "from '../bar/baz'" to "from '../bar/baz.js'"
++
++Make only the minimal changes needed to fix this error. Do not modify anything else.
+
+# 2025-12-11 00:12:20.856286
++Error group: TS2835
++Group description: Add .js extensions to 15 import statements across 7 files
++
++Target file: src/agents/review-engine-core.ts
++Lines involved: [4]
++
++Instruction:
++Add .js extension to all relative import statements on lines: 4. Change patterns like "from './foo'" to "from './foo.js'" and "from '../bar/baz'" to "from '../bar/baz.js'"
++
++Make only the minimal changes needed to fix this error. Do not modify anything else.
+
+# 2025-12-11 00:14:21.020274
++Error group: TS2835
++Group description: Add .js extensions to 15 import statements across 7 files
++
++Target file: src/agents/review-engine.ts
++Lines involved: [5,6,7]
++
++Instruction:
++Add .js extension to all relative import statements on lines: 5, 6, 7. Change patterns like "from './foo'" to "from './foo.js'" and "from '../bar/baz'" to "from '../bar/baz.js'"
++
++Make only the minimal changes needed to fix this error. Do not modify anything else.
+
+# 2025-12-11 00:14:21.020383
++Error group: TS2835
++Group description: Add .js extensions to 15 import statements across 7 files
++
++Target file: src/agents/review-engine.ts
++Lines involved: [5,6,7]
++
++Instruction:
++Add .js extension to all relative import statements on lines: 5, 6, 7. Change patterns like "from './foo'" to "from './foo.js'" and "from '../bar/baz'" to "from '../bar/baz.js'"
++
++Make only the minimal changes needed to fix this error. Do not modify anything else.
+
+# 2025-12-11 00:16:20.940955
++Error group: TS2835
++Group description: Add .js extensions to 15 import statements across 7 files
++
++Target file: src/config/config-loader.ts
++Lines involved: [10]
++
++Instruction:
++Add .js extension to all relative import statements on lines: 10. Change patterns like "from './foo'" to "from './foo.js'" and "from '../bar/baz'" to "from '../bar/baz.js'"
++
++Make only the minimal changes needed to fix this error. Do not modify anything else.
+
+# 2025-12-11 00:16:20.941312
++Error group: TS2835
++Group description: Add .js extensions to 15 import statements across 7 files
++
++Target file: src/config/config-loader.ts
++Lines involved: [10]
++
++Instruction:
++Add .js extension to all relative import statements on lines: 10. Change patterns like "from './foo'" to "from './foo.js'" and "from '../bar/baz'" to "from '../bar/baz.js'"
++
++Make only the minimal changes needed to fix this error. Do not modify anything else.
+
+# 2025-12-11 00:18:27.070520
++Error group: TS2835
++Group description: Add .js extensions to 15 import statements across 7 files
++
++Target file: src/agents/review-engine-core.ts
++Lines involved: [4]
++
++Instruction:
++Add .js extension to all relative import statements on lines: 4. Change patterns like "from './foo'" to "from './foo.js'" and "from '../bar/baz'" to "from '../bar/baz.js'"
++
++Make only the minimal changes needed to fix this error. Do not modify anything else.
+
+# 2025-12-11 00:18:27.070659
++Error group: TS2835
++Group description: Add .js extensions to 15 import statements across 7 files
++
++Target file: src/agents/review-engine-core.ts
++Lines involved: [4]
++
++Instruction:
++Add .js extension to all relative import statements on lines: 4. Change patterns like "from './foo'" to "from './foo.js'" and "from '../bar/baz'" to "from '../bar/baz.js'"
++
++Make only the minimal changes needed to fix this error. Do not modify anything else.
+
+# 2025-12-11 00:19:43.522513
++Error group: TS2835
++Group description: Add .js extensions to 15 import statements across 7 files
++
++Target file: src/agents/review-engine.ts
++Lines involved: [5,6,7]
++
++Instruction:
++Add .js extension to all relative import statements on lines: 5, 6, 7. Change patterns like "from './foo'" to "from './foo.js'" and "from '../bar/baz'" to "from '../bar/baz.js'"
++
++Make only the minimal changes needed to fix this error. Do not modify anything else.
+
+# 2025-12-11 00:19:43.522765
++Error group: TS2835
++Group description: Add .js extensions to 15 import statements across 7 files
++
++Target file: src/agents/review-engine.ts
++Lines involved: [5,6,7]
++
++Instruction:
++Add .js extension to all relative import statements on lines: 5, 6, 7. Change patterns like "from './foo'" to "from './foo.js'" and "from '../bar/baz'" to "from '../bar/baz.js'"
++
++Make only the minimal changes needed to fix this error. Do not modify anything else.
+
+# 2025-12-11 00:22:26.661147
++Add .js extension to the import on line 5: change "from './review-engine-types'" to "from './review-engine-types.js'"
+
+# 2025-12-11 00:22:26.661443
++Add .js extension to the import on line 5: change "from './review-engine-types'" to "from './review-engine-types.js'"
+
+# 2025-12-11 00:37:12.789455
++Error group: TS2835
++Group description: Add .js extensions to 15 import statements across 7 files
++
++Target file: src/agents/review-engine-core.ts
++Lines involved: [4]
++
++Instruction:
++Add .js extension to all relative import statements on lines: 4. Change patterns like "from './foo'" to "from './foo.js'" and "from '../bar/baz'" to "from '../bar/baz.js'"
++
++Current code:
++Line 4: import { PRFile, ReviewFinding, PostReviewContext } from './review-engine-types';
++
++Make only the minimal changes needed to fix this error. Do not modify anything else.
+
+# 2025-12-11 00:37:12.790724
++Error group: TS2835
++Group description: Add .js extensions to 15 import statements across 7 files
++
++Target file: src/agents/review-engine-core.ts
++Lines involved: [4]
++
++Instruction:
++Add .js extension to all relative import statements on lines: 4. Change patterns like "from './foo'" to "from './foo.js'" and "from '../bar/baz'" to "from '../bar/baz.js'"
++
++Current code:
++Line 4: import { PRFile, ReviewFinding, PostReviewContext } from './review-engine-types';
++
++Make only the minimal changes needed to fix this error. Do not modify anything else.
+
+# 2025-12-11 00:40:14.942135
++Error group: TS2835
++Group description: Add .js extensions to 15 import statements across 7 files
++
++Target file: src/agents/review-engine.ts
++Lines involved: [5,6,7]
++
++Instruction:
++Add .js extension to all relative import statements on lines: 5, 6, 7. Change patterns like "from './foo'" to "from './foo.js'" and "from '../bar/baz'" to "from '../bar/baz.js'"
++
++Current code:
++Line 5: import { ConfigLoader } from '../config/config-loader';
++Line 6: import { ReviewEngineCore } from './review-engine-core';
++Line 7: import { PRFile, ReviewFinding, FilterStats, PostReviewContext } from './review-engine-types';
++
++Make only the minimal changes needed to fix this error. Do not modify anything else.
+
+# 2025-12-11 00:40:14.942445
++Error group: TS2835
++Group description: Add .js extensions to 15 import statements across 7 files
++
++Target file: src/agents/review-engine.ts
++Lines involved: [5,6,7]
++
++Instruction:
++Add .js extension to all relative import statements on lines: 5, 6, 7. Change patterns like "from './foo'" to "from './foo.js'" and "from '../bar/baz'" to "from '../bar/baz.js'"
++
++Current code:
++Line 5: import { ConfigLoader } from '../config/config-loader';
++Line 6: import { ReviewEngineCore } from './review-engine-core';
++Line 7: import { PRFile, ReviewFinding, FilterStats, PostReviewContext } from './review-engine-types';
++
++Make only the minimal changes needed to fix this error. Do not modify anything else.
+
+# 2025-12-11 00:43:13.829778
++Error group: TS2835
++Group description: Add .js extensions to 15 import statements across 7 files
++
++Target file: src/config/config-loader.ts
++Lines involved: [10]
++
++Instruction:
++Add .js extension to all relative import statements on lines: 10. Change patterns like "from './foo'" to "from './foo.js'" and "from '../bar/baz'" to "from '../bar/baz.js'"
++
++Current code:
++Line 10: } from '../providers/index';
++
++Make only the minimal changes needed to fix this error. Do not modify anything else.
+
+# 2025-12-11 00:43:13.830128
++Error group: TS2835
++Group description: Add .js extensions to 15 import statements across 7 files
++
++Target file: src/config/config-loader.ts
++Lines involved: [10]
++
++Instruction:
++Add .js extension to all relative import statements on lines: 10. Change patterns like "from './foo'" to "from './foo.js'" and "from '../bar/baz'" to "from '../bar/baz.js'"
++
++Current code:
++Line 10: } from '../providers/index';
++
++Make only the minimal changes needed to fix this error. Do not modify anything else.
+
+# 2025-12-11 00:44:37.147499
++Error group: TS2835
++Group description: Add .js extensions to 15 import statements across 7 files
++
++Target file: src/index.ts
++Lines involved: [4,5]
++
++Instruction:
++Add .js extension to all relative import statements on lines: 4, 5. Change patterns like "from './foo'" to "from './foo.js'" and "from '../bar/baz'" to "from '../bar/baz.js'"
++
++Current code:
++Line 4: import { ConfigLoader } from './config/config-loader';
++Line 5: import { ReviewEngine } from './agents/review-engine';
++
++Make only the minimal changes needed to fix this error. Do not modify anything else.
+
+# 2025-12-11 00:44:37.147961
++Error group: TS2835
++Group description: Add .js extensions to 15 import statements across 7 files
++
++Target file: src/index.ts
++Lines involved: [4,5]
++
++Instruction:
++Add .js extension to all relative import statements on lines: 4, 5. Change patterns like "from './foo'" to "from './foo.js'" and "from '../bar/baz'" to "from '../bar/baz.js'"
++
++Current code:
++Line 4: import { ConfigLoader } from './config/config-loader';
++Line 5: import { ReviewEngine } from './agents/review-engine';
++
++Make only the minimal changes needed to fix this error. Do not modify anything else.
+
+# 2025-12-11 00:45:35.804919
++Error group: TS2835
++Group description: Add .js extensions to 15 import statements across 7 files
++
++Target file: src/pr-test.ts
++Lines involved: [5]
++
++Instruction:
++Add .js extension to all relative import statements on lines: 5. Change patterns like "from './foo'" to "from './foo.js'" and "from '../bar/baz'" to "from '../bar/baz.js'"
++
++Current code:
++Line 5: import { ReviewEngine } from "./agents/review-engine";
++
++Make only the minimal changes needed to fix this error. Do not modify anything else.
+
+# 2025-12-11 00:45:35.805512
++Error group: TS2835
++Group description: Add .js extensions to 15 import statements across 7 files
++
++Target file: src/pr-test.ts
++Lines involved: [5]
++
++Instruction:
++Add .js extension to all relative import statements on lines: 5. Change patterns like "from './foo'" to "from './foo.js'" and "from '../bar/baz'" to "from '../bar/baz.js'"
++
++Current code:
++Line 5: import { ReviewEngine } from "./agents/review-engine";
++
++Make only the minimal changes needed to fix this error. Do not modify anything else.
+
+# 2025-12-11 00:46:43.649353
++Error group: TS2835
++Group description: Add .js extensions to 15 import statements across 7 files
++
++Target file: src/providers/index.ts
++Lines involved: [5,6,7,9,10,11]
++
++Instruction:
++Add .js extension to all relative import statements on lines: 5, 6, 7, 9, 10, 11. Change patterns like "from './foo'" to "from './foo.js'" and "from '../bar/baz'" to "from '../bar/baz.js'"
++
++Current code:
++Line 5: export * from './api-provider-base';
++Line 6: export * from './claude-provider';
++Line 7: export * from './gemini-provider';
++Line 9: export * from './ollama-provider';
++Line 10: export * from './openai-provider';
++Line 11: export * from './openrouter-provider';
++
++Make only the minimal changes needed to fix this error. Do not modify anything else.
+
+# 2025-12-11 00:46:43.649584
++Error group: TS2835
++Group description: Add .js extensions to 15 import statements across 7 files
++
++Target file: src/providers/index.ts
++Lines involved: [5,6,7,9,10,11]
++
++Instruction:
++Add .js extension to all relative import statements on lines: 5, 6, 7, 9, 10, 11. Change patterns like "from './foo'" to "from './foo.js'" and "from '../bar/baz'" to "from '../bar/baz.js'"
++
++Current code:
++Line 5: export * from './api-provider-base';
++Line 6: export * from './claude-provider';
++Line 7: export * from './gemini-provider';
++Line 9: export * from './ollama-provider';
++Line 10: export * from './openai-provider';
++Line 11: export * from './openrouter-provider';
++
++Make only the minimal changes needed to fix this error. Do not modify anything else.
+
+# 2025-12-11 00:48:49.417551
++Error group: TS2835
++Group description: Add .js extensions to 15 import statements across 7 files
++
++Target file: src/providers/ollama-provider.ts
++Lines involved: [3]
++
++Instruction:
++Add .js extension to all relative import statements on lines: 3. Change patterns like "from './foo'" to "from './foo.js'" and "from '../bar/baz'" to "from '../bar/baz.js'"
++
++Current code:
++Line 3: import { ApiProviderBase, ApiCallParams } from './api-provider-base';
++
++Make only the minimal changes needed to fix this error. Do not modify anything else.
+
+# 2025-12-11 00:48:49.424596
++Error group: TS2835
++Group description: Add .js extensions to 15 import statements across 7 files
++
++Target file: src/providers/ollama-provider.ts
++Lines involved: [3]
++
++Instruction:
++Add .js extension to all relative import statements on lines: 3. Change patterns like "from './foo'" to "from './foo.js'" and "from '../bar/baz'" to "from '../bar/baz.js'"
++
++Current code:
++Line 3: import { ApiProviderBase, ApiCallParams } from './api-provider-base';
++
++Make only the minimal changes needed to fix this error. Do not modify anything else.
+
+# 2025-12-11 00:51:49.695506
++Error group: TS7006
++Group description: Add type annotations to 6 parameters with implicit 'any'
++
++Target file: src/agents/review-engine.ts
++Lines involved: [102]
++
++Instruction:
++Add explicit type annotation to parameter 'pattern' on line 102. Common types: string, number, any, or a specific interface type.
++
++Current code:
++Line 102: repo: repoName,
++
++Make only the minimal changes needed to fix this error. Do not modify anything else.
+
+# 2025-12-11 00:51:49.713521
++Error group: TS7006
++Group description: Add type annotations to 6 parameters with implicit 'any'
++
++Target file: src/agents/review-engine.ts
++Lines involved: [102]
++
++Instruction:
++Add explicit type annotation to parameter 'pattern' on line 102. Common types: string, number, any, or a specific interface type.
++
++Current code:
++Line 102: repo: repoName,
++
++Make only the minimal changes needed to fix this error. Do not modify anything else.
+
+# 2025-12-11 00:51:58.702330
++add a comment that says hello
+
+# 2025-12-11 00:51:58.702684
++add a comment that says hello
+
+# 2025-12-11 00:53:39.234160
++Error group: TS7006
++Group description: Add type annotations to 6 parameters with implicit 'any'
++
++Target file: src/pr-test.ts
++Lines involved: [60]
++
++Instruction:
++Add explicit type annotation to parameter 'f' on line 60. Common types: string, number, any, or a specific interface type.
++
++Current code:
++Line 60: files.forEach(f => {
++
++Make only the minimal changes needed to fix this error. Do not modify anything else.
+
+# 2025-12-11 00:53:39.279257
++Error group: TS7006
++Group description: Add type annotations to 6 parameters with implicit 'any'
++
++Target file: src/pr-test.ts
++Lines involved: [60]
++
++Instruction:
++Add explicit type annotation to parameter 'f' on line 60. Common types: string, number, any, or a specific interface type.
++
++Current code:
++Line 60: files.forEach(f => {
++
++Make only the minimal changes needed to fix this error. Do not modify anything else.
+
+# 2025-12-11 00:55:08.608688
++Error group: TS7006
++Group description: Add type annotations to 6 parameters with implicit 'any'
++
++Target file: src/pr-test.ts
++Lines involved: [131]
++
++Instruction:
++Add explicit type annotation to parameter 'finding' on line 131. Common types: string, number, any, or a specific interface type.
++
++Current code:
++Line 131: findings.forEach((finding, i) => {
++
++Make only the minimal changes needed to fix this error. Do not modify anything else.
+
+# 2025-12-11 00:55:08.614641
++Error group: TS7006
++Group description: Add type annotations to 6 parameters with implicit 'any'
++
++Target file: src/pr-test.ts
++Lines involved: [131]
++
++Instruction:
++Add explicit type annotation to parameter 'finding' on line 131. Common types: string, number, any, or a specific interface type.
++
++Current code:
++Line 131: findings.forEach((finding, i) => {
++
++Make only the minimal changes needed to fix this error. Do not modify anything else.
+
+# 2025-12-11 00:58:09.503910
++Error group: TS7006
++Group description: Add type annotations to 6 parameters with implicit 'any'
++
++Target file: src/pr-test.ts
++Lines involved: [131]
++
++Instruction:
++Add explicit type annotation to parameter 'i' on line 131. Common types: string, number, any, or a specific interface type.
++
++Current code:
++Line 131: findings.forEach((finding, i) => {
++
++Make only the minimal changes needed to fix this error. Do not modify anything else.
+
+# 2025-12-11 00:58:09.505090
++Error group: TS7006
++Group description: Add type annotations to 6 parameters with implicit 'any'
++
++Target file: src/pr-test.ts
++Lines involved: [131]
++
++Instruction:
++Add explicit type annotation to parameter 'i' on line 131. Common types: string, number, any, or a specific interface type.
++
++Current code:
++Line 131: findings.forEach((finding, i) => {
++
++Make only the minimal changes needed to fix this error. Do not modify anything else.
+
+# 2025-12-11 01:01:10.088643
++Error group: TS7006
++Group description: Add type annotations to 6 parameters with implicit 'any'
++
++Target file: src/pr-test.ts
++Lines involved: [141]
++
++Instruction:
++Add explicit type annotation to parameter 'f' on line 141. Common types: string, number, any, or a specific interface type.
++
++Current code:
++Line 141: const high = findings.filter(f => f.severity === 'high').length;
++
++Make only the minimal changes needed to fix this error. Do not modify anything else.
+
+# 2025-12-11 01:01:10.098963
++Error group: TS7006
++Group description: Add type annotations to 6 parameters with implicit 'any'
++
++Target file: src/pr-test.ts
++Lines involved: [141]
++
++Instruction:
++Add explicit type annotation to parameter 'f' on line 141. Common types: string, number, any, or a specific interface type.
++
++Current code:
++Line 141: const high = findings.filter(f => f.severity === 'high').length;
++
++Make only the minimal changes needed to fix this error. Do not modify anything else.
+
+# 2025-12-11 01:02:41.327105
++Error group: TS7006
++Group description: Add type annotations to 6 parameters with implicit 'any'
++
++Target file: src/pr-test.ts
++Lines involved: [142]
++
++Instruction:
++Add explicit type annotation to parameter 'f' on line 142. Common types: string, number, any, or a specific interface type.
++
++Current code:
++Line 142: const medium = findings.filter(f => f.severity === 'medium').length;
++
++Make only the minimal changes needed to fix this error. Do not modify anything else.
+
+# 2025-12-11 01:02:41.327841
++Error group: TS7006
++Group description: Add type annotations to 6 parameters with implicit 'any'
++
++Target file: src/pr-test.ts
++Lines involved: [142]
++
++Instruction:
++Add explicit type annotation to parameter 'f' on line 142. Common types: string, number, any, or a specific interface type.
++
++Current code:
++Line 142: const medium = findings.filter(f => f.severity === 'medium').length;
++
++Make only the minimal changes needed to fix this error. Do not modify anything else.
+
+# 2025-12-11 01:05:43.130565
++Error group: TS2304
++Group description: Add missing import for 'LLMProvider' to 4 files
++
++Target file: src/providers/claude-provider.ts
++Lines involved: [1]
++
++Instruction:
++Add import statement at top of file: import { LLMProvider } from './llm-provider.interface.js';
++
++Current code:
++Line 1: // src/providers/claude-provider.ts
++
++Make only the minimal changes needed to fix this error. Do not modify anything else.
+
+# 2025-12-11 01:05:43.146300
++Error group: TS2304
++Group description: Add missing import for 'LLMProvider' to 4 files
++
++Target file: src/providers/claude-provider.ts
++Lines involved: [1]
++
++Instruction:
++Add import statement at top of file: import { LLMProvider } from './llm-provider.interface.js';
++
++Current code:
++Line 1: // src/providers/claude-provider.ts
++
++Make only the minimal changes needed to fix this error. Do not modify anything else.
+
+# 2025-12-11 01:09:02.097217
++Error group: TS2835
++Group description: Add .js extensions to 15 import statements across 7 files
++
++Target file: src/agents/review-engine-core.ts
++Lines involved: [4]
++
++Instruction:
++Add .js extension to all relative import statements on lines: 4. Change patterns like "from './foo'" to "from './foo.js'" and "from '../bar/baz'" to "from '../bar/baz.js'"
++
++Current code:
++Line 4: import { PRFile, ReviewFinding, PostReviewContext } from './review-engine-types';
++
++Make only the minimal changes needed to fix this error. Do not modify anything else.
+
+# 2025-12-11 01:09:02.097442
++Error group: TS2835
++Group description: Add .js extensions to 15 import statements across 7 files
++
++Target file: src/agents/review-engine-core.ts
++Lines involved: [4]
++
++Instruction:
++Add .js extension to all relative import statements on lines: 4. Change patterns like "from './foo'" to "from './foo.js'" and "from '../bar/baz'" to "from '../bar/baz.js'"
++
++Current code:
++Line 4: import { PRFile, ReviewFinding, PostReviewContext } from './review-engine-types';
++
++Make only the minimal changes needed to fix this error. Do not modify anything else.
+
+# 2025-12-11 01:12:03.117210
++Error group: TS2835
++Group description: Add .js extensions to 15 import statements across 7 files
++
++Target file: src/agents/review-engine.ts
++Lines involved: [5,6,7]
++
++Instruction:
++Add .js extension to all relative import statements on lines: 5, 6, 7. Change patterns like "from './foo'" to "from './foo.js'" and "from '../bar/baz'" to "from '../bar/baz.js'"
++
++Current code:
++Line 5: import { ConfigLoader } from '../config/config-loader';
++Line 6: import { ReviewEngineCore } from './review-engine-core';
++Line 7: import { PRFile, ReviewFinding, FilterStats, PostReviewContext } from './review-engine-types';
++
++Make only the minimal changes needed to fix this error. Do not modify anything else.
+
+# 2025-12-11 01:12:03.120031
++Error group: TS2835
++Group description: Add .js extensions to 15 import statements across 7 files
++
++Target file: src/agents/review-engine.ts
++Lines involved: [5,6,7]
++
++Instruction:
++Add .js extension to all relative import statements on lines: 5, 6, 7. Change patterns like "from './foo'" to "from './foo.js'" and "from '../bar/baz'" to "from '../bar/baz.js'"
++
++Current code:
++Line 5: import { ConfigLoader } from '../config/config-loader';
++Line 6: import { ReviewEngineCore } from './review-engine-core';
++Line 7: import { PRFile, ReviewFinding, FilterStats, PostReviewContext } from './review-engine-types';
++
++Make only the minimal changes needed to fix this error. Do not modify anything else.
+
+# 2025-12-11 01:15:03.640173
++Error group: TS2835
++Group description: Add .js extensions to 15 import statements across 7 files
++
++Target file: src/config/config-loader.ts
++Lines involved: [10]
++
++Instruction:
++Add .js extension to all relative import statements on lines: 10. Change patterns like "from './foo'" to "from './foo.js'" and "from '../bar/baz'" to "from '../bar/baz.js'"
++
++Current code:
++Line 10: } from '../providers/index';
++
++Make only the minimal changes needed to fix this error. Do not modify anything else.
+
+# 2025-12-11 01:15:03.644823
++Error group: TS2835
++Group description: Add .js extensions to 15 import statements across 7 files
++
++Target file: src/config/config-loader.ts
++Lines involved: [10]
++
++Instruction:
++Add .js extension to all relative import statements on lines: 10. Change patterns like "from './foo'" to "from './foo.js'" and "from '../bar/baz'" to "from '../bar/baz.js'"
++
++Current code:
++Line 10: } from '../providers/index';
++
++Make only the minimal changes needed to fix this error. Do not modify anything else.
+
+# 2025-12-11 01:17:47.579726
++Error group: TS2835
++Group description: Add .js extensions to 15 import statements across 7 files
++
++Target file: src/index.ts
++Lines involved: [4,5]
++
++Instruction:
++Add .js extension to all relative import statements on lines: 4, 5. Change patterns like "from './foo'" to "from './foo.js'" and "from '../bar/baz'" to "from '../bar/baz.js'"
++
++Current code:
++Line 4: import { ConfigLoader } from './config/config-loader';
++Line 5: import { ReviewEngine } from './agents/review-engine';
++
++Make only the minimal changes needed to fix this error. Do not modify anything else.
+
+# 2025-12-11 01:17:47.581175
++Error group: TS2835
++Group description: Add .js extensions to 15 import statements across 7 files
++
++Target file: src/index.ts
++Lines involved: [4,5]
++
++Instruction:
++Add .js extension to all relative import statements on lines: 4, 5. Change patterns like "from './foo'" to "from './foo.js'" and "from '../bar/baz'" to "from '../bar/baz.js'"
++
++Current code:
++Line 4: import { ConfigLoader } from './config/config-loader';
++Line 5: import { ReviewEngine } from './agents/review-engine';
++
++Make only the minimal changes needed to fix this error. Do not modify anything else.
+
+# 2025-12-11 01:19:39.699193
++Error group: TS2835
++Group description: Add .js extensions to 15 import statements across 7 files
++
++Target file: src/agents/review-engine-core.ts
++Lines involved: [4]
++
++Instruction:
++Add .js extension to all relative import statements on lines: 4. Change patterns like "from './foo'" to "from './foo.js'" and "from '../bar/baz'" to "from '../bar/baz.js'"
++
++Current code:
++Line 4: import { PRFile, ReviewFinding, PostReviewContext } from './review-engine-types';
++
++Make only the minimal changes needed to fix this error. Do not modify anything else.
+
+# 2025-12-11 01:19:39.699822
++Error group: TS2835
++Group description: Add .js extensions to 15 import statements across 7 files
++
++Target file: src/agents/review-engine-core.ts
++Lines involved: [4]
++
++Instruction:
++Add .js extension to all relative import statements on lines: 4. Change patterns like "from './foo'" to "from './foo.js'" and "from '../bar/baz'" to "from '../bar/baz.js'"
++
++Current code:
++Line 4: import { PRFile, ReviewFinding, PostReviewContext } from './review-engine-types';
++
++Make only the minimal changes needed to fix this error. Do not modify anything else.
+
+# 2025-12-11 01:22:38.821037
++Error group: TS2835
++Group description: Add .js extensions to 15 import statements across 7 files
++
++Target file: src/agents/review-engine.ts
++Lines involved: [5,6,7]
++
++Instruction:
++Add .js extension to all relative import statements on lines: 5, 6, 7. Change patterns like "from './foo'" to "from './foo.js'" and "from '../bar/baz'" to "from '../bar/baz.js'"
++
++Current code:
++Line 5: import { ConfigLoader } from '../config/config-loader';
++Line 6: import { ReviewEngineCore } from './review-engine-core';
++Line 7: import { PRFile, ReviewFinding, FilterStats, PostReviewContext } from './review-engine-types';
++
++Make only the minimal changes needed to fix this error. Do not modify anything else.
+
+# 2025-12-11 01:22:38.821510
++Error group: TS2835
++Group description: Add .js extensions to 15 import statements across 7 files
++
++Target file: src/agents/review-engine.ts
++Lines involved: [5,6,7]
++
++Instruction:
++Add .js extension to all relative import statements on lines: 5, 6, 7. Change patterns like "from './foo'" to "from './foo.js'" and "from '../bar/baz'" to "from '../bar/baz.js'"
++
++Current code:
++Line 5: import { ConfigLoader } from '../config/config-loader';
++Line 6: import { ReviewEngineCore } from './review-engine-core';
++Line 7: import { PRFile, ReviewFinding, FilterStats, PostReviewContext } from './review-engine-types';
++
++Make only the minimal changes needed to fix this error. Do not modify anything else.
+
+# 2025-12-11 01:25:16.084427
++Add .js extension to all relative export statements. Change 'export * from ./foo' to 'export * from ./foo.js'. Do NOT add .js to './providers' since it's already a directory export.
+
+# 2025-12-11 01:25:16.084803
++Add .js extension to all relative export statements. Change 'export * from ./foo' to 'export * from ./foo.js'. Do NOT add .js to './providers' since it's already a directory export.
+
+# 2025-12-11 01:56:24.960507
++Error group: TS2835
++Group description: Add .js extensions to 15 import statements across 7 files
++
++Target file: src/agents/review-engine-core.ts
++Lines involved: [4]
++
++Instruction:
++Add .js extension to all relative import statements on lines: 4. Change patterns like "from './foo'" to "from './foo.js'" and "from '../bar/baz'" to "from '../bar/baz.js'"
++
++Current code:
++Line 4: import { PRFile, ReviewFinding, PostReviewContext } from './review-engine-types';
++
++IMPORTANT: Only add .js extension to relative imports/exports (those starting with ./ or ../). Do NOT add .js to npm packages or directory re-exports that are already correct.
++Make only the minimal changes needed to fix this error. Do not modify anything else.
+
+# 2025-12-11 01:56:24.961998
++Error group: TS2835
++Group description: Add .js extensions to 15 import statements across 7 files
++
++Target file: src/agents/review-engine-core.ts
++Lines involved: [4]
++
++Instruction:
++Add .js extension to all relative import statements on lines: 4. Change patterns like "from './foo'" to "from './foo.js'" and "from '../bar/baz'" to "from '../bar/baz.js'"
++
++Current code:
++Line 4: import { PRFile, ReviewFinding, PostReviewContext } from './review-engine-types';
++
++IMPORTANT: Only add .js extension to relative imports/exports (those starting with ./ or ../). Do NOT add .js to npm packages or directory re-exports that are already correct.
++Make only the minimal changes needed to fix this error. Do not modify anything else.
+
+# 2025-12-11 01:59:25.865341
++Error group: TS2835
++Group description: Add .js extensions to 15 import statements across 7 files
++
++Target file: src/agents/review-engine.ts
++Lines involved: [5,6,7]
++
++Instruction:
++Add .js extension to all relative import statements on lines: 5, 6, 7. Change patterns like "from './foo'" to "from './foo.js'" and "from '../bar/baz'" to "from '../bar/baz.js'"
++
++Current code:
++Line 5: import { ConfigLoader } from '../config/config-loader';
++Line 6: import { ReviewEngineCore } from './review-engine-core';
++Line 7: import { PRFile, ReviewFinding, FilterStats, PostReviewContext } from './review-engine-types';
++
++IMPORTANT: Only add .js extension to relative imports/exports (those starting with ./ or ../). Do NOT add .js to npm packages or directory re-exports that are already correct.
++Make only the minimal changes needed to fix this error. Do not modify anything else.
+
+# 2025-12-11 01:59:25.868432
++Error group: TS2835
++Group description: Add .js extensions to 15 import statements across 7 files
++
++Target file: src/agents/review-engine.ts
++Lines involved: [5,6,7]
++
++Instruction:
++Add .js extension to all relative import statements on lines: 5, 6, 7. Change patterns like "from './foo'" to "from './foo.js'" and "from '../bar/baz'" to "from '../bar/baz.js'"
++
++Current code:
++Line 5: import { ConfigLoader } from '../config/config-loader';
++Line 6: import { ReviewEngineCore } from './review-engine-core';
++Line 7: import { PRFile, ReviewFinding, FilterStats, PostReviewContext } from './review-engine-types';
++
++IMPORTANT: Only add .js extension to relative imports/exports (those starting with ./ or ../). Do NOT add .js to npm packages or directory re-exports that are already correct.
++Make only the minimal changes needed to fix this error. Do not modify anything else.
+
+# 2025-12-11 02:02:25.649875
++Error group: TS2835
++Group description: Add .js extensions to 15 import statements across 7 files
++
++Target file: src/config/config-loader.ts
++Lines involved: [10]
++
++Instruction:
++Add .js extension to all relative import statements on lines: 10. Change patterns like "from './foo'" to "from './foo.js'" and "from '../bar/baz'" to "from '../bar/baz.js'"
++
++Current code:
++Line 10: } from '../providers/index';
++
++IMPORTANT: Only add .js extension to relative imports/exports (those starting with ./ or ../). Do NOT add .js to npm packages or directory re-exports that are already correct.
++Make only the minimal changes needed to fix this error. Do not modify anything else.
+
+# 2025-12-11 02:02:25.651650
++Error group: TS2835
++Group description: Add .js extensions to 15 import statements across 7 files
++
++Target file: src/config/config-loader.ts
++Lines involved: [10]
++
++Instruction:
++Add .js extension to all relative import statements on lines: 10. Change patterns like "from './foo'" to "from './foo.js'" and "from '../bar/baz'" to "from '../bar/baz.js'"
++
++Current code:
++Line 10: } from '../providers/index';
++
++IMPORTANT: Only add .js extension to relative imports/exports (those starting with ./ or ../). Do NOT add .js to npm packages or directory re-exports that are already correct.
++Make only the minimal changes needed to fix this error. Do not modify anything else.
+
+# 2025-12-11 02:05:26.203001
++Error group: TS2835
++Group description: Add .js extensions to 15 import statements across 7 files
++
++Target file: src/index.ts
++Lines involved: [4,5]
++
++Instruction:
++Add .js extension to all relative import statements on lines: 4, 5. Change patterns like "from './foo'" to "from './foo.js'" and "from '../bar/baz'" to "from '../bar/baz.js'"
++
++Current file exports:
++Line 39: export default (app: Probot) => {
++
++IMPORTANT: Only add .js extension to relative imports/exports (those starting with ./ or ../). Do NOT add .js to npm packages or directory re-exports that are already correct.
++Make only the minimal changes needed to fix this error. Do not modify anything else.
+
+# 2025-12-11 02:05:26.204562
++Error group: TS2835
++Group description: Add .js extensions to 15 import statements across 7 files
++
++Target file: src/index.ts
++Lines involved: [4,5]
++
++Instruction:
++Add .js extension to all relative import statements on lines: 4, 5. Change patterns like "from './foo'" to "from './foo.js'" and "from '../bar/baz'" to "from '../bar/baz.js'"
++
++Current file exports:
++Line 39: export default (app: Probot) => {
++
++IMPORTANT: Only add .js extension to relative imports/exports (those starting with ./ or ../). Do NOT add .js to npm packages or directory re-exports that are already correct.
++Make only the minimal changes needed to fix this error. Do not modify anything else.
+
+# 2025-12-11 02:08:26.254658
++Error group: TS2835
++Group description: Add .js extensions to 15 import statements across 7 files
++
++Target file: src/pr-test.ts
++Lines involved: [5]
++
++Instruction:
++Add .js extension to all relative import statements on lines: 5. Change patterns like "from './foo'" to "from './foo.js'" and "from '../bar/baz'" to "from '../bar/baz.js'"
++
++Current code:
++Line 5: import { ReviewEngine } from "./agents/review-engine";
++
++IMPORTANT: Only add .js extension to relative imports/exports (those starting with ./ or ../). Do NOT add .js to npm packages or directory re-exports that are already correct.
++Make only the minimal changes needed to fix this error. Do not modify anything else.
+
+# 2025-12-11 02:08:26.255121
++Error group: TS2835
++Group description: Add .js extensions to 15 import statements across 7 files
++
++Target file: src/pr-test.ts
++Lines involved: [5]
++
++Instruction:
++Add .js extension to all relative import statements on lines: 5. Change patterns like "from './foo'" to "from './foo.js'" and "from '../bar/baz'" to "from '../bar/baz.js'"
++
++Current code:
++Line 5: import { ReviewEngine } from "./agents/review-engine";
++
++IMPORTANT: Only add .js extension to relative imports/exports (those starting with ./ or ../). Do NOT add .js to npm packages or directory re-exports that are already correct.
++Make only the minimal changes needed to fix this error. Do not modify anything else.
+
+# 2025-12-11 02:11:20.710992
++Error group: TS2835
++Group description: Add .js extensions to 15 import statements across 7 files
++
++Target file: src/providers/index.ts
++Lines involved: [5,6,7,9,10,11]
++
++Instruction:
++Add .js extension to all relative import statements on lines: 5, 6, 7, 9, 10, 11. Change patterns like "from './foo'" to "from './foo.js'" and "from '../bar/baz'" to "from '../bar/baz.js'"
++
++Current file exports:
++Line 5: export * from './api-provider-base';
++Line 6: export * from './claude-provider';
++Line 7: export * from './gemini-provider';
++Line 8: export * from './llm-provider.interface';
++Line 9: export * from './ollama-provider';
++Line 10: export * from './openai-provider';
++Line 11: export * from './openrouter-provider';
++Line 12: export * from './providers';
++
++IMPORTANT: Only add .js extension to relative imports/exports (those starting with ./ or ../). Do NOT add .js to npm packages or directory re-exports that are already correct.
++Make only the minimal changes needed to fix this error. Do not modify anything else.
+
+# 2025-12-11 02:11:20.711380
++Error group: TS2835
++Group description: Add .js extensions to 15 import statements across 7 files
++
++Target file: src/providers/index.ts
++Lines involved: [5,6,7,9,10,11]
++
++Instruction:
++Add .js extension to all relative import statements on lines: 5, 6, 7, 9, 10, 11. Change patterns like "from './foo'" to "from './foo.js'" and "from '../bar/baz'" to "from '../bar/baz.js'"
++
++Current file exports:
++Line 5: export * from './api-provider-base';
++Line 6: export * from './claude-provider';
++Line 7: export * from './gemini-provider';
++Line 8: export * from './llm-provider.interface';
++Line 9: export * from './ollama-provider';
++Line 10: export * from './openai-provider';
++Line 11: export * from './openrouter-provider';
++Line 12: export * from './providers';
++
++IMPORTANT: Only add .js extension to relative imports/exports (those starting with ./ or ../). Do NOT add .js to npm packages or directory re-exports that are already correct.
++Make only the minimal changes needed to fix this error. Do not modify anything else.
+
+# 2025-12-11 17:44:07.794769
++Error group: TS2835
++Group description: Add .js extensions to 15 import statements across 7 files
++
++Target file: src/agents/review-engine-core.ts
++Lines involved: [4]
++
++Instruction:
++Add .js extension to all relative import statements on lines: 4. Change patterns like "from './foo'" to "from './foo.js'" and "from '../bar/baz'" to "from '../bar/baz.js'"
++
++Current code:
++Line 4: import { PRFile, ReviewFinding, PostReviewContext } from './review-engine-types';
++
++IMPORTANT: Only add .js extension to relative imports/exports (those starting with ./ or ../). Do NOT add .js to npm packages or directory re-exports that are already correct.
++Make only the minimal changes needed to fix this error. Do not modify anything else.
+
+# 2025-12-11 17:44:07.795171
++Error group: TS2835
++Group description: Add .js extensions to 15 import statements across 7 files
++
++Target file: src/agents/review-engine-core.ts
++Lines involved: [4]
++
++Instruction:
++Add .js extension to all relative import statements on lines: 4. Change patterns like "from './foo'" to "from './foo.js'" and "from '../bar/baz'" to "from '../bar/baz.js'"
++
++Current code:
++Line 4: import { PRFile, ReviewFinding, PostReviewContext } from './review-engine-types';
++
++IMPORTANT: Only add .js extension to relative imports/exports (those starting with ./ or ../). Do NOT add .js to npm packages or directory re-exports that are already correct.
++Make only the minimal changes needed to fix this error. Do not modify anything else.
+
+# 2025-12-11 17:47:07.407300
++Error group: TS2835
++Group description: Add .js extensions to 15 import statements across 7 files
++
++Target file: src/agents/review-engine.ts
++Lines involved: [5,6,7]
++
++Instruction:
++Add .js extension to all relative import statements on lines: 5, 6, 7. Change patterns like "from './foo'" to "from './foo.js'" and "from '../bar/baz'" to "from '../bar/baz.js'"
++
++Current code:
++Line 5: import { ConfigLoader } from '../config/config-loader';
++Line 6: import { ReviewEngineCore } from './review-engine-core';
++Line 7: import { PRFile, ReviewFinding, FilterStats, PostReviewContext } from './review-engine-types';
++
++IMPORTANT: Only add .js extension to relative imports/exports (those starting with ./ or ../). Do NOT add .js to npm packages or directory re-exports that are already correct.
++Make only the minimal changes needed to fix this error. Do not modify anything else.
+
+# 2025-12-11 17:47:07.407554
++Error group: TS2835
++Group description: Add .js extensions to 15 import statements across 7 files
++
++Target file: src/agents/review-engine.ts
++Lines involved: [5,6,7]
++
++Instruction:
++Add .js extension to all relative import statements on lines: 5, 6, 7. Change patterns like "from './foo'" to "from './foo.js'" and "from '../bar/baz'" to "from '../bar/baz.js'"
++
++Current code:
++Line 5: import { ConfigLoader } from '../config/config-loader';
++Line 6: import { ReviewEngineCore } from './review-engine-core';
++Line 7: import { PRFile, ReviewFinding, FilterStats, PostReviewContext } from './review-engine-types';
++
++IMPORTANT: Only add .js extension to relative imports/exports (those starting with ./ or ../). Do NOT add .js to npm packages or directory re-exports that are already correct.
++Make only the minimal changes needed to fix this error. Do not modify anything else.
+
+# 2025-12-11 17:49:43.864543
++Error group: TS2835
++Group description: Add .js extensions to 15 import statements across 7 files
++
++Target file: src/config/config-loader.ts
++Lines involved: [10]
++
++Instruction:
++Add .js extension to all relative import statements on lines: 10. Change patterns like "from './foo'" to "from './foo.js'" and "from '../bar/baz'" to "from '../bar/baz.js'"
++
++Current code:
++Line 10: } from '../providers/index';
++
++IMPORTANT: Only add .js extension to relative imports/exports (those starting with ./ or ../). Do NOT add .js to npm packages or directory re-exports that are already correct.
++Make only the minimal changes needed to fix this error. Do not modify anything else.
+
+# 2025-12-11 17:49:43.864950
++Error group: TS2835
++Group description: Add .js extensions to 15 import statements across 7 files
++
++Target file: src/config/config-loader.ts
++Lines involved: [10]
++
++Instruction:
++Add .js extension to all relative import statements on lines: 10. Change patterns like "from './foo'" to "from './foo.js'" and "from '../bar/baz'" to "from '../bar/baz.js'"
++
++Current code:
++Line 10: } from '../providers/index';
++
++IMPORTANT: Only add .js extension to relative imports/exports (those starting with ./ or ../). Do NOT add .js to npm packages or directory re-exports that are already correct.
++Make only the minimal changes needed to fix this error. Do not modify anything else.
+
+# 2025-12-11 17:51:14.392168
++Error group: TS2835
++Group description: Add .js extensions to 15 import statements across 7 files
++
++Target file: src/index.ts
++Lines involved: [4,5]
++
++Instruction:
++Add .js extension to all relative import statements on lines: 4, 5. Change patterns like "from './foo'" to "from './foo.js'" and "from '../bar/baz'" to "from '../bar/baz.js'"
++
++Current file exports:
++Line 39: export default (app: Probot) => {
++
++IMPORTANT: Only add .js extension to relative imports/exports (those starting with ./ or ../). Do NOT add .js to npm packages or directory re-exports that are already correct.
++Make only the minimal changes needed to fix this error. Do not modify anything else.
+
+# 2025-12-11 17:51:14.392424
++Error group: TS2835
++Group description: Add .js extensions to 15 import statements across 7 files
++
++Target file: src/index.ts
++Lines involved: [4,5]
++
++Instruction:
++Add .js extension to all relative import statements on lines: 4, 5. Change patterns like "from './foo'" to "from './foo.js'" and "from '../bar/baz'" to "from '../bar/baz.js'"
++
++Current file exports:
++Line 39: export default (app: Probot) => {
++
++IMPORTANT: Only add .js extension to relative imports/exports (those starting with ./ or ../). Do NOT add .js to npm packages or directory re-exports that are already correct.
++Make only the minimal changes needed to fix this error. Do not modify anything else.
+
+# 2025-12-11 17:53:01.831443
++Error group: TS2835
++Group description: Add .js extensions to 15 import statements across 7 files
++
++Target file: src/pr-test.ts
++Lines involved: [5]
++
++Instruction:
++Add .js extension to all relative import statements on lines: 5. Change patterns like "from './foo'" to "from './foo.js'" and "from '../bar/baz'" to "from '../bar/baz.js'"
++
++Current code:
++Line 5: import { ReviewEngine } from "./agents/review-engine.js";
++
++IMPORTANT: Only add .js extension to relative imports/exports (those starting with ./ or ../). Do NOT add .js to npm packages or directory re-exports that are already correct.
++Make only the minimal changes needed to fix this error. Do not modify anything else.
+
+# 2025-12-11 17:53:01.831681
++Error group: TS2835
++Group description: Add .js extensions to 15 import statements across 7 files
++
++Target file: src/pr-test.ts
++Lines involved: [5]
++
++Instruction:
++Add .js extension to all relative import statements on lines: 5. Change patterns like "from './foo'" to "from './foo.js'" and "from '../bar/baz'" to "from '../bar/baz.js'"
++
++Current code:
++Line 5: import { ReviewEngine } from "./agents/review-engine.js";
++
++IMPORTANT: Only add .js extension to relative imports/exports (those starting with ./ or ../). Do NOT add .js to npm packages or directory re-exports that are already correct.
++Make only the minimal changes needed to fix this error. Do not modify anything else.
+
+# 2025-12-11 17:54:58.739194
++Error group: TS2835
++Group description: Add .js extensions to 15 import statements across 7 files
++
++Target file: src/providers/index.ts
++Lines involved: [5,6,7,9,10,11]
++
++Instruction:
++Add .js extension to all relative import statements on lines: 5, 6, 7, 9, 10, 11. Change patterns like "from './foo'" to "from './foo.js'" and "from '../bar/baz'" to "from '../bar/baz.js'"
++
++Current file exports:
++Line 5: export * from './api-provider-base';
++Line 6: export * from './claude-provider';
++Line 7: export * from './gemini-provider';
++Line 8: export * from './llm-provider.interface';
++Line 9: export * from './ollama-provider';
++Line 10: export * from './openai-provider';
++Line 11: export * from './openrouter-provider';
++Line 12: export * from './providers';
++
++IMPORTANT: Only add .js extension to relative imports/exports (those starting with ./ or ../). Do NOT add .js to npm packages or directory re-exports that are already correct.
++Make only the minimal changes needed to fix this error. Do not modify anything else.
+
+# 2025-12-11 17:54:58.739476
++Error group: TS2835
++Group description: Add .js extensions to 15 import statements across 7 files
++
++Target file: src/providers/index.ts
++Lines involved: [5,6,7,9,10,11]
++
++Instruction:
++Add .js extension to all relative import statements on lines: 5, 6, 7, 9, 10, 11. Change patterns like "from './foo'" to "from './foo.js'" and "from '../bar/baz'" to "from '../bar/baz.js'"
++
++Current file exports:
++Line 5: export * from './api-provider-base';
++Line 6: export * from './claude-provider';
++Line 7: export * from './gemini-provider';
++Line 8: export * from './llm-provider.interface';
++Line 9: export * from './ollama-provider';
++Line 10: export * from './openai-provider';
++Line 11: export * from './openrouter-provider';
++Line 12: export * from './providers';
++
++IMPORTANT: Only add .js extension to relative imports/exports (those starting with ./ or ../). Do NOT add .js to npm packages or directory re-exports that are already correct.
++Make only the minimal changes needed to fix this error. Do not modify anything else.
+
+# 2025-12-11 17:57:00.437986
++Error group: TS2835
++Group description: Add .js extensions to 15 import statements across 7 files
++
++Target file: src/providers/ollama-provider.ts
++Lines involved: [3]
++
++Instruction:
++Add .js extension to all relative import statements on lines: 3. Change patterns like "from './foo'" to "from './foo.js'" and "from '../bar/baz'" to "from '../bar/baz.js'"
++
++Current code:
++Line 3: import { ApiProviderBase, ApiCallParams } from './api-provider-base';
++
++IMPORTANT: Only add .js extension to relative imports/exports (those starting with ./ or ../). Do NOT add .js to npm packages or directory re-exports that are already correct.
++Make only the minimal changes needed to fix this error. Do not modify anything else.
+
+# 2025-12-11 17:57:00.438200
++Error group: TS2835
++Group description: Add .js extensions to 15 import statements across 7 files
++
++Target file: src/providers/ollama-provider.ts
++Lines involved: [3]
++
++Instruction:
++Add .js extension to all relative import statements on lines: 3. Change patterns like "from './foo'" to "from './foo.js'" and "from '../bar/baz'" to "from '../bar/baz.js'"
++
++Current code:
++Line 3: import { ApiProviderBase, ApiCallParams } from './api-provider-base';
++
++IMPORTANT: Only add .js extension to relative imports/exports (those starting with ./ or ../). Do NOT add .js to npm packages or directory re-exports that are already correct.
++Make only the minimal changes needed to fix this error. Do not modify anything else.
+
+# 2025-12-11 17:58:43.035341
++Error group: TS7006
++Group description: Add type annotations to 6 parameters with implicit 'any'
++
++Target file: src/agents/review-engine.ts
++Lines involved: [102]
++
++Instruction:
++Add explicit type annotation to parameter 'pattern' on line 102. Common types: string, number, any, or a specific interface type.
++
++Current code:
++Line 102: repo: repoName,
++
++IMPORTANT: Only add .js extension to relative imports/exports (those starting with ./ or ../). Do NOT add .js to npm packages or directory re-exports that are already correct.
++Make only the minimal changes needed to fix this error. Do not modify anything else.
+
+# 2025-12-11 17:58:43.036056
++Error group: TS7006
++Group description: Add type annotations to 6 parameters with implicit 'any'
++
++Target file: src/agents/review-engine.ts
++Lines involved: [102]
++
++Instruction:
++Add explicit type annotation to parameter 'pattern' on line 102. Common types: string, number, any, or a specific interface type.
++
++Current code:
++Line 102: repo: repoName,
++
++IMPORTANT: Only add .js extension to relative imports/exports (those starting with ./ or ../). Do NOT add .js to npm packages or directory re-exports that are already correct.
++Make only the minimal changes needed to fix this error. Do not modify anything else.
+
+# 2025-12-11 18:01:33.248236
++Error group: TS7006
++Group description: Add type annotations to 6 parameters with implicit 'any'
++
++Target file: src/pr-test.ts
++Lines involved: [60]
++
++Instruction:
++Add explicit type annotation to parameter 'f' on line 60. Common types: string, number, any, or a specific interface type.
++
++Current code:
++Line 60: files.forEach(f => {
++
++IMPORTANT: Only add .js extension to relative imports/exports (those starting with ./ or ../). Do NOT add .js to npm packages or directory re-exports that are already correct.
++Make only the minimal changes needed to fix this error. Do not modify anything else.
+
+# 2025-12-11 18:01:33.248792
++Error group: TS7006
++Group description: Add type annotations to 6 parameters with implicit 'any'
++
++Target file: src/pr-test.ts
++Lines involved: [60]
++
++Instruction:
++Add explicit type annotation to parameter 'f' on line 60. Common types: string, number, any, or a specific interface type.
++
++Current code:
++Line 60: files.forEach(f => {
++
++IMPORTANT: Only add .js extension to relative imports/exports (those starting with ./ or ../). Do NOT add .js to npm packages or directory re-exports that are already correct.
++Make only the minimal changes needed to fix this error. Do not modify anything else.
+
+# 2025-12-11 18:03:29.159512
++Error group: TS7006
++Group description: Add type annotations to 6 parameters with implicit 'any'
++
++Target file: src/pr-test.ts
++Lines involved: [131]
++
++Instruction:
++Add explicit type annotation to parameter 'finding' on line 131. Common types: string, number, any, or a specific interface type.
++
++Current code:
++Line 131: findings.forEach((finding, i) => {
++
++IMPORTANT: Only add .js extension to relative imports/exports (those starting with ./ or ../). Do NOT add .js to npm packages or directory re-exports that are already correct.
++Make only the minimal changes needed to fix this error. Do not modify anything else.
+
+# 2025-12-11 18:03:29.159877
++Error group: TS7006
++Group description: Add type annotations to 6 parameters with implicit 'any'
++
++Target file: src/pr-test.ts
++Lines involved: [131]
++
++Instruction:
++Add explicit type annotation to parameter 'finding' on line 131. Common types: string, number, any, or a specific interface type.
++
++Current code:
++Line 131: findings.forEach((finding, i) => {
++
++IMPORTANT: Only add .js extension to relative imports/exports (those starting with ./ or ../). Do NOT add .js to npm packages or directory re-exports that are already correct.
++Make only the minimal changes needed to fix this error. Do not modify anything else.
+
+# 2025-12-11 18:05:25.608767
++Error group: TS7006
++Group description: Add type annotations to 6 parameters with implicit 'any'
++
++Target file: src/pr-test.ts
++Lines involved: [131]
++
++Instruction:
++Add explicit type annotation to parameter 'i' on line 131. Common types: string, number, any, or a specific interface type.
++
++Current code:
++Line 131: findings.forEach((finding, i) => {
++
++IMPORTANT: Only add .js extension to relative imports/exports (those starting with ./ or ../). Do NOT add .js to npm packages or directory re-exports that are already correct.
++Make only the minimal changes needed to fix this error. Do not modify anything else.
+
+# 2025-12-11 18:05:25.609052
++Error group: TS7006
++Group description: Add type annotations to 6 parameters with implicit 'any'
++
++Target file: src/pr-test.ts
++Lines involved: [131]
++
++Instruction:
++Add explicit type annotation to parameter 'i' on line 131. Common types: string, number, any, or a specific interface type.
++
++Current code:
++Line 131: findings.forEach((finding, i) => {
++
++IMPORTANT: Only add .js extension to relative imports/exports (those starting with ./ or ../). Do NOT add .js to npm packages or directory re-exports that are already correct.
++Make only the minimal changes needed to fix this error. Do not modify anything else.
+
+# 2025-12-11 18:08:25.774314
++Error group: TS7006
++Group description: Add type annotations to 6 parameters with implicit 'any'
++
++Target file: src/pr-test.ts
++Lines involved: [141]
++
++Instruction:
++Add explicit type annotation to parameter 'f' on line 141. Common types: string, number, any, or a specific interface type.
++
++Current code:
++Line 141: const high = findings.filter(f => f.severity === 'high').length;
++
++IMPORTANT: Only add .js extension to relative imports/exports (those starting with ./ or ../). Do NOT add .js to npm packages or directory re-exports that are already correct.
++Make only the minimal changes needed to fix this error. Do not modify anything else.
+
+# 2025-12-11 18:08:25.774616
++Error group: TS7006
++Group description: Add type annotations to 6 parameters with implicit 'any'
++
++Target file: src/pr-test.ts
++Lines involved: [141]
++
++Instruction:
++Add explicit type annotation to parameter 'f' on line 141. Common types: string, number, any, or a specific interface type.
++
++Current code:
++Line 141: const high = findings.filter(f => f.severity === 'high').length;
++
++IMPORTANT: Only add .js extension to relative imports/exports (those starting with ./ or ../). Do NOT add .js to npm packages or directory re-exports that are already correct.
++Make only the minimal changes needed to fix this error. Do not modify anything else.
+
+# 2025-12-11 18:10:30.142004
++Error group: TS7006
++Group description: Add type annotations to 6 parameters with implicit 'any'
++
++Target file: src/pr-test.ts
++Lines involved: [142]
++
++Instruction:
++Add explicit type annotation to parameter 'f' on line 142. Common types: string, number, any, or a specific interface type.
++
++Current code:
++Line 142: const medium = findings.filter(f => f.severity === 'medium').length;
++
++IMPORTANT: Only add .js extension to relative imports/exports (those starting with ./ or ../). Do NOT add .js to npm packages or directory re-exports that are already correct.
++Make only the minimal changes needed to fix this error. Do not modify anything else.
+
+# 2025-12-11 18:10:30.142365
++Error group: TS7006
++Group description: Add type annotations to 6 parameters with implicit 'any'
++
++Target file: src/pr-test.ts
++Lines involved: [142]
++
++Instruction:
++Add explicit type annotation to parameter 'f' on line 142. Common types: string, number, any, or a specific interface type.
++
++Current code:
++Line 142: const medium = findings.filter(f => f.severity === 'medium').length;
++
++IMPORTANT: Only add .js extension to relative imports/exports (those starting with ./ or ../). Do NOT add .js to npm packages or directory re-exports that are already correct.
++Make only the minimal changes needed to fix this error. Do not modify anything else.
+
+# 2025-12-11 18:12:30.545336
++Error group: TS2304
++Group description: Add missing import for 'LLMProvider' to 4 files
++
++Target file: src/providers/claude-provider.ts
++Lines involved: [1]
++
++Instruction:
++Add import statement at top of file: import { LLMProvider } from './llm-provider.interface.js';
++
++Current code:
++Line 1: // src/providers/claude-provider.ts
++
++IMPORTANT: Only add .js extension to relative imports/exports (those starting with ./ or ../). Do NOT add .js to npm packages or directory re-exports that are already correct.
++Make only the minimal changes needed to fix this error. Do not modify anything else.
+
+# 2025-12-11 18:12:30.545693
++Error group: TS2304
++Group description: Add missing import for 'LLMProvider' to 4 files
++
++Target file: src/providers/claude-provider.ts
++Lines involved: [1]
++
++Instruction:
++Add import statement at top of file: import { LLMProvider } from './llm-provider.interface.js';
++
++Current code:
++Line 1: // src/providers/claude-provider.ts
++
++IMPORTANT: Only add .js extension to relative imports/exports (those starting with ./ or ../). Do NOT add .js to npm packages or directory re-exports that are already correct.
++Make only the minimal changes needed to fix this error. Do not modify anything else.
