@@ -7,7 +7,7 @@ import {
     OpenAIProvider,
     ClaudeProvider,
     OpenRouterProvider,
-} from '../providers/index';
+} from '../providers/index.js';
 import yaml from 'js-yaml';
 import * as fs from 'node:fs';
 
