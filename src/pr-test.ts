@@ -2,7 +2,7 @@
 // Run this to test the improved prompt on a specific PR
 
 import { Octokit } from "@octokit/rest";
-import { ReviewEngine } from "./agents/review-engine";
+import { ReviewEngine } from "./agents/review-engine.js";
 import { OllamaProvider } from "../src/providers";
 
 async function testReview() {
@@ -57,7 +57,7 @@ async function testReview() {
     });
     
     console.log(`✓ Found ${files.length} changed files:`);
-    files.forEach(f => {
+    files.forEach((f: PRFile) => {
       console.log(`  - ${f.filename} (+${f.additions}/-${f.deletions}, ${f.changes} total)`);
     });
     console.log("");
@@ -128,7 +128,7 @@ async function testReview() {
       console.log("   - Use a larger model (qwen2.5-coder:14b or 32b)");
       console.log("   - Switch to Claude API for better results");
     } else {
-      findings.forEach((finding, i) => {
+      findings.forEach((finding: ReviewFinding, i: number) => {
         console.log(`${i + 1}. [${finding.severity.toUpperCase()}] ${finding.filename}`);
         if (finding.line) console.log(`   Line ${finding.line}`);
         console.log(`   Category: ${finding.category}`);
@@ -138,8 +138,8 @@ async function testReview() {
       });
 
       // Summary by severity
-      const high = findings.filter(f => f.severity === 'high').length;
-      const medium = findings.filter(f => f.severity === 'medium').length;
+      const high = findings.filter((f: ReviewFinding) => f.severity === 'high').length;
+      const medium = findings.filter((f: ReviewFinding) => f.severity === 'medium').length;
       
       console.log("📈 Summary:");
       console.log(`   🔴 High: ${high}`);
