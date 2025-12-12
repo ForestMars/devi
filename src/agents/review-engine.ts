@@ -2,9 +2,21 @@
 
 import { Context } from 'probot';
 import { LLMProvider } from '../providers';
-import { ConfigLoader } from '../config/config-loader';
-import { ReviewEngineCore } from './review-engine-core';
-import { PRFile, ReviewFinding, FilterStats, PostReviewContext } from './review-engine-types';
+import { ConfigLoader } from '../config/config-loader.js';
+import { ReviewEngineCore } from './review-engine-core.js';
+import { PRFile, ReviewFinding, FilterStats, PostReviewContext } from './review-engine-types.js';
+
+interface PRFile {
+  sha: string;
+  filename: string;
+  status: 'added' | 'modified' | 'deleted' | 'renamed';
+  additions: number;
+  deletions: number;
+  changes: number;
+  blob_url: string;
+  raw_url: string;
+  contents_url: string;
+}
 import * as path from 'path';
 import * as fs from 'fs';
 
