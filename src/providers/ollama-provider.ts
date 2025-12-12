@@ -1,6 +1,6 @@
 // src/providers/ollama-provider.ts
 
-import { ApiProviderBase, ApiCallParams } from './api-provider-base';
+import { ApiProviderBase, ApiCallParams } from './api-provider-base.js';
 
 export class OllamaProvider extends ApiProviderBase {
     readonly name: string = 'Ollama';
